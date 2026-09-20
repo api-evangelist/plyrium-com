@@ -1,0 +1,58 @@
+specification: API Commons Rate Limits
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/RateLimits
+provider: Plyrium
+providerId: plyrium-com
+created: '2026-09-19'
+modified: '2026-09-19'
+generated: '2026-09-19'
+method: searched
+source: https://vouchspec.plyrium.com/openapi.json
+sources:
+- https://vouchspec.plyrium.com/openapi.json (components.responses.RateLimited on POST /validate; TooLarge 413)
+- https://vouchspec.plyrium.com/api/vouchspec/v1/discovery (request.maximum_bytes, payment max_timeout)
+- https://raw.githubusercontent.com/mordiaky/vouchspec/main/docs/stage-b-operations.md ("bounded public/tenant registration and commerce limits"; byte bounds)
+- live responses of 2026-09-19 (no rate-limit headers on any of 12 probed responses)
+tags:
+- Rate Limiting
+- Agent Skills
+description: >-
+  VouchSpec documents THAT it rate-limits (a 429 RateLimited response on the paid POST, and "bounded ... rate ...
+  controls" in the operations doc) but publishes no numeric request limit, window or scope, and returns no
+  RateLimit-*, X-RateLimit-* or Retry-After header on the responses observed. The only numeric bounds published
+  are payload and time bounds, recorded separately below. limit_count is therefore an honest zero.
+limit_count: 0
+limits: []
+responseCodes:
+  throttled: 429
+  payloadTooLarge: 413
+headers:
+  rateLimit: null
+  retryAfter: not documented on 429; the provider's SKILL.md says to honour Retry-After when polling order endpoints
+  note: none observed on discovery, openapi, llms.txt, agent-card, issuer key, health, 402, 404 or 422 responses
+payload_and_time_bounds:
+- name: Commerce request body
+  scope: per-request
+  metric: bytes
+  limit: 16384
+  source: discovery request.maximum_bytes; OpenAPI 413 TooLarge
+- name: PAYMENT-SIGNATURE header
+  scope: per-request
+  metric: bytes
+  limit: 16384
+  source: OpenAPI components.parameters.PaymentSignature maxLength
+- name: Payment authorisation validity
+  scope: per-challenge
+  metric: seconds
+  limit: 300
+  source: /.well-known/x402 accepts[].maxTimeoutSeconds
+- name: Signed-result body
+  scope: per-response
+  metric: bytes
+  limit: 1000000
+  source: stage-b-operations.md
+- name: Expected delivery
+  scope: per-order
+  metric: minutes
+  limit: 10
+  source: discovery fulfillment.expected_delivery_minutes (an expectation, not a limit)

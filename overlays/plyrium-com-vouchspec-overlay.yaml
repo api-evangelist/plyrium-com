@@ -1,0 +1,67 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the VouchSpec Agent Skill Evidence API
+  version: 1.0.0
+  description: >-
+    Non-destructive annotations over the provider-hosted OpenAPI 3.1 (openapi/plyrium-com-vouchspec-openapi.yml,
+    verbatim from https://vouchspec.plyrium.com/openapi.json on 2026-09-19). Records what API Evangelist observed
+    on the wire and cross-links the derived artifacts; the original document is never mutated. generated 2026-09-19,
+    method generated.
+extends: openapi/plyrium-com-vouchspec-openapi.yml
+actions:
+- target: $.info
+  update:
+    x-apievangelist-profile: https://github.com/api-evangelist/plyrium-com
+    x-apievangelist-observed: '2026-09-19'
+    x-apievangelist-authentication: authentication/plyrium-com-authentication.yml
+    x-apievangelist-conventions: conventions/plyrium-com-conventions.yml
+    x-apievangelist-errors: errors/plyrium-com-problem-types.yml
+    x-apievangelist-agent-card: a2a/plyrium-com-a2a.yml
+    x-apievangelist-mcp: mcp/plyrium-com-mcp.yml
+    contact:
+      name: Plyrium
+      url: https://www.plyrium.com/contact
+- target: $.info.description
+  description: The spec description omits that the whole read surface is anonymous and that MCP/A2A carry discovery only.
+  update: >-
+    Agent-only API for purchasing fresh, isolated static validation and signed evidence for one exact immutable
+    public GitHub Agent Skill commit. There is no human checkout. Seven operations are anonymous reads; only POST
+    /api/vouchspec/v1/validate is x402-paid. The remote MCP server and A2A agent expose the discovery operation only.
+- target: $.paths['/api/vouchspec/v1/validate'].post
+  update:
+    x-apievangelist-dry-run: An empty unpaid POST returns the 402 challenge with no side effect (observed 2026-09-19); rehearse here before authorising payment.
+    x-apievangelist-idempotency: delivery_id is the idempotent-recovery handle; exact paid retries return the same credentials (discovery acquisition.exact_payment_retries_return_same_credentials).
+    x-apievangelist-reversibility: No reversal operation; automatic USDC remedy for objective failures only, no buyer window stated - see conventions/ reversibility.
+- target: $.paths['/api/vouchspec/v1/validate'].post.responses
+  description: The service answers 422 for a schema-invalid JSON body; the contract declares 400 for that case.
+  update:
+    '422':
+      description: 'Observed, not declared by the provider: {"error":{"code":"invalid_commerce_request","message":"fresh validation request is invalid"}} for a well-formed JSON body that fails the strict ValidationRequest schema.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+- target: $.paths['/api/vouchspec/v1/validate'].post.responses['402']
+  update:
+    x-apievangelist-observed-body-fields: ['error.code payment_required', 'protocol x402', 'x402Version 2', 'resource', 'accepts[]', 'extensions.bazaar.info.input.body (a complete example request)']
+- target: $.paths['/api/vouchspec/v1/receipts/{sha256_hex}'].get.responses['404']
+  update:
+    x-apievangelist-observed: '{"error":{"code":"not_found","message":"resource not found"}} with Cache-Control no-store'
+- target: $.paths['/api/vouchspec/v1/discovery'].get
+  update:
+    x-apievangelist-link-relations: 'Link: </api/vouchspec/v1/keys/issuer>; rel="verification-key", </openapi.json>; rel="service-desc", </llms.txt>; rel="describedby", </.well-known/ai-catalog.json>; rel="ai-catalog"'
+    x-apievangelist-cache-control: public, max-age=300
+- target: $.paths['/api/vouchspec/v1/health'].get
+  update:
+    x-apievangelist-cache-control: no-store
+    x-apievangelist-observed-fields: [status ok, version 0.6.0, environment live, live_settlement true, price_usdc 0.25]
+- target: $.components.schemas.Error
+  update:
+    x-apievangelist-observed-codes: [payment_required, not_found, invalid_commerce_request]
+- target: $
+  update:
+    x-apievangelist-gaps:
+    - No securitySchemes are declared; the payment gate is expressed only through x-x402, the 402 response and the PAYMENT-SIGNATURE parameter.
+    - The credentialed order/result/delivery-token routes named in discovery are absent from the contract.
+    - No RateLimit-* or Retry-After headers are declared on the 429 response.
+    - 403 and 429 responses have no documented cause.

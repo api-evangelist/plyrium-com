@@ -1,0 +1,95 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  openapi/plyrium-com-vouchspec-openapi.yml (content types, extensions, jsonSchemaDialect), the live responses of
+  2026-09-19 (402 PAYMENT-REQUIRED header, Link relations, MCP initialize, A2A message/send), the discovery
+  document, docs/methodology.md in https://github.com/mordiaky/vouchspec, and https://www.plyrium.com/privacy.
+description: >-
+  Standards the VouchSpec API declares in its own contract or demonstrably implements on the wire. Each entry
+  carries the exact location the claim was read from. No certification (SOC 2, ISO 27001, PCI) is published by
+  Plyrium anywhere reachable, so no Compliance pointer is emitted.
+standards:
+- id: x402
+  name: x402 v2 (HTTP 402 payment protocol, Coinbase)
+  conforms: true
+  evidence: >-
+    openapi paths./api/vouchspec/v1/validate.post.x-x402 {version 2, scheme exact, network eip155:8453}; response 402
+    declares header PAYMENT-REQUIRED (required) and parameter PAYMENT-SIGNATURE; /.well-known/x402 manifest x402Version 2.
+    OBSERVED: an unpaid POST returned 402 with a base64 PAYMENT-REQUIRED header decoding to {x402Version:2, accepts:[...]}
+    and a body carrying extensions.bazaar - the live wire behaviour, not just a claim.
+- id: a2a
+  name: Agent2Agent protocol
+  conforms: true
+  version: 0.3.0
+  evidence: /.well-known/agent-card.json protocolVersion 0.3.0, preferredTransport JSONRPC; graded conformant against A2A 1.0.0 hard checks in a2a/plyrium-com-a2a.yml; live message/send answered 200.
+- id: mcp
+  name: Model Context Protocol
+  conforms: true
+  version: '2025-11-25'
+  evidence: MCP initialize returned protocolVersion 2025-11-25 over Streamable HTTP; tools/list returned a tool with inputSchema and annotations (readOnlyHint etc.); listed in the official MCP Registry as io.github.mordiaky/vouchspec.
+- id: openapi-3.1
+  conforms: true
+  evidence: openapi/plyrium-com-vouchspec-openapi.yml openapi 3.1.0, jsonSchemaDialect https://json-schema.org/draft/2020-12/schema, served at /openapi.json and /.well-known/openapi.json.
+- id: json-schema-2020-12
+  conforms: true
+  evidence: jsonSchemaDialect declared; schemas use const, pattern, additionalProperties false; the discovery document embeds the same request schema.
+- id: llms-txt
+  conforms: true
+  evidence: https://vouchspec.plyrium.com/llms.txt (text/markdown; H1, blockquote, H2 link sections) - saved verbatim in llms/.
+- id: agent-skills
+  name: Agent Skills (SKILL.md + /.well-known/skills/index.json)
+  conforms: true
+  evidence: /.well-known/skills/index.json lists vouchspec-verify-before-install with files [SKILL.md]; SKILL.md carries name/description/compatibility frontmatter - saved verbatim in skills/.
+- id: ard-ai-catalog
+  name: Agentic Resource Discovery / AI Catalog
+  conforms: true
+  version: specVersion 1.0 (ARD 0.9 draft)
+  evidence: /.well-known/ai-catalog.json with host.displayName Plyrium and two urn:air:vouchspec.plyrium.com entries typed application/a2a-agent-card+json and application/openapi+json. Discovery labels ard_spec_status draft_proposal.
+- id: dsse
+  name: DSSE (Dead Simple Signing Envelope) v1.0.2
+  conforms: true
+  domain_standard: true
+  evidence: >-
+    DECLARED IN THE CONTRACT: openapi paths./api/vouchspec/v1/receipts/{sha256_hex}.get.responses.200.content is
+    application/vnd.dsse.envelope.v1+json; discovery result.authenticated_media_type is the same. Methodology: "Public
+    receipts are DSSE v1.0.2 envelopes signed with Ed25519". This is the software-supply-chain evidence market's
+    envelope standard (shared with in-toto/Sigstore); a buyer that already verifies DSSE integrates with no bespoke
+    connector.
+- id: ed25519-jwk
+  name: Ed25519 signatures with RFC 8037 OKP JWK keys and RFC 7638 thumbprint key IDs
+  conforms: true
+  evidence: >-
+    openapi components.schemas.IssuerKey algorithm const Ed25519 + public_key_jwk; live /api/vouchspec/v1/keys/issuer
+    returned {kty OKP, crv Ed25519}; methodology.md states keyid is an RFC 7638 thumbprint.
+- id: rfc8288-link-relations
+  conforms: true
+  evidence: 'observed Link headers on /api/vouchspec/v1/discovery: rel="verification-key", rel="service-desc" (OpenAPI), rel="describedby", rel="ai-catalog"; /openapi.json and /llms.txt link back the same way.'
+- id: rfc8615-well-known
+  conforms: true
+  evidence: agent-card.json, agent.json, ai-catalog.json, x402, skills/index.json and openapi.json are all served under /.well-known/ on vouchspec.plyrium.com (well-known/plyrium-com-well-known.yml).
+- id: idempotency-key-header
+  conforms: true
+  scope: partial
+  evidence: 'discovery authentication.idempotency_header "Idempotency-Key: {unique_8_to_128_character_value}"; not declared on the public POST in the OpenAPI - see conventions/ idempotency.coverage partial.'
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: errors are application/json {error:{code,message}} (components.schemas.Error); no application/problem+json anywhere in the spec or on the wire.
+- id: oauth2
+  conforms: false
+  evidence: no securitySchemes in the OpenAPI; no oauth-authorization-server or oauth-protected-resource metadata on any host (all probed 2026-09-19). Access is anonymous or payment-gated by design.
+- id: oidc
+  conforms: false
+  evidence: /.well-known/openid-configuration absent on every host.
+- id: rfc8594-sunset
+  conforms: false
+  evidence: no Sunset or Deprecation headers documented or observed; no deprecated operations in the spec.
+- id: pagination
+  conforms: false
+  evidence: not applicable - no list operations.
+- id: in-toto-attestation
+  conforms: false
+  evidence: >-
+    Not claimed for the paid receipt. The separate publisher-CI GitHub Action (mordiaky/vouchspec/distribution/github-action)
+    produces GitHub artifact attestations verifiable with `gh attestation verify`, but that is a CI artifact, not this API's output.
+certifications: []
+compliance_pointer_emitted: false

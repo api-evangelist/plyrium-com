@@ -1,0 +1,152 @@
+generated: '2026-09-19'
+method: searched
+probe: true
+source: https://www.plyrium.com/privacy
+sources:
+- https://www.plyrium.com/privacy (HTTP 200, "Last updated: July 12, 2026")
+- https://www.plyrium.com/terms (HTTP 200, "Last updated: July 12, 2026")
+- https://www.plyrium.com/vouchspec/policies (HTTP 200)
+- https://www.plyrium.com/ (HTTP 200, AI receptionist safeguards section)
+conventional_paths_probed:
+- {url: https://www.plyrium.com/accessibility, status: 307, note: redirects to /login}
+- {url: https://www.plyrium.com/legal/subprocessors, status: 307}
+- {url: https://www.plyrium.com/legal/dpa, status: 307}
+- {url: https://www.plyrium.com/privacy/requests, status: 404}
+- {url: https://www.plyrium.com/transparency, status: 307}
+- {url: https://www.plyrium.com/trust, status: 307}
+- {url: https://www.plyrium.com/security/sbom, status: 307}
+- {url: https://www.plyrium.com/ai, status: 307}
+- {url: https://www.plyrium.com/dpa, status: 307}
+- {url: https://www.plyrium.com/subprocessors, status: 307}
+- {url: https://www.plyrium.com/.well-known/security.txt, status: 307}
+note: >-
+  Every signal below was read from the privacy policy or terms; Plyrium publishes no dedicated legal, trust or
+  accessibility pages (all conventional paths fall into the app's login catch-all). Signals are recorded for
+  the Plyrium SaaS operator, which is the legal entity behind the VouchSpec API; VouchSpec's own policies page
+  covers refunds, accepted inputs and credential handling and is cited where it adds substance. Absent:
+  sbom, support_lifetime, accessibility_conformance, training_data_summary, age_assurance (the policy only
+  states the service is not directed at under-18s), notice_and_action, transparency_report.
+signals:
+  data_subject_request:
+    url: https://www.plyrium.com/privacy
+    section: "'7. Your Rights' and '15. Contact Us'"
+    channel: privacy@plyrium.com
+    stated_sla: 'We will respond within 30 days (or sooner where required by law).'
+    rights_named: [access, correction, deletion ("right to be forgotten"), portability (CSV/JSON exports from the dashboard), opt out of marketing, object to processing, CCPA/CPRA rights for California residents, GDPR / UK GDPR rights for EEA/UK/Swiss residents]
+    evidence:
+    - source: https://www.plyrium.com/privacy
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'For privacy-specific requests including access, correction, deletion, or portability of your data: privacy@plyrium.com'
+    - source: https://www.plyrium.com/privacy
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'To exercise any of these rights, email privacy@plyrium.com. We will respond within 30 days (or sooner where required by law).'
+    note: A documented channel and response period inside the privacy policy; no intake form or API (/privacy/requests 404).
+  subprocessors:
+    url: https://www.plyrium.com/privacy
+    section: '4. Third-Party Service Providers (Sub-Processors)'
+    dated: '2026-07-12'
+    entries:
+    - {vendor: Vercel, purpose: application hosting and CDN}
+    - {vendor: Supabase, purpose: Postgres database, location: United States (us-east-1)}
+    - {vendor: Anthropic (Claude), purpose: text generation and AI receptionist responses, note: zero data retention configured}
+    - {vendor: Vapi, purpose: AI voice receptionist orchestration; stores call recordings and transcripts}
+    - {vendor: ElevenLabs (via Vapi), purpose: text-to-speech}
+    - {vendor: MiniMax (Shanghai Xiyu Technology Co., Ltd.) (via Vapi), purpose: alternate text-to-speech, note: hosted via Vapi's worldwide region}
+    - {vendor: Deepgram (via Vapi), purpose: speech-to-text}
+    - {vendor: Stripe, purpose: card processing, recurring billing, Stripe Connect}
+    - {vendor: Resend, purpose: transactional email}
+    - {vendor: Quo Software (formerly OpenPhone), purpose: legacy telephony and historical messaging records}
+    - {vendor: Sentry, purpose: error monitoring}
+    - {vendor: PostHog (U.S. region), purpose: product analytics, note: identifiers SHA-256 hashed before transmission}
+    - {vendor: OpenStreetMap Foundation (Nominatim API), purpose: geocoding service addresses}
+    - {vendor: Google (Business Profile API, Calendar API, OAuth), purpose: GBP posting, review replies, calendar free/busy}
+    - {vendor: Meta, purpose: opt-in marketing pixel on the marketing site}
+    change_notice: "'We will provide reasonable notice before adding a new sub-processor that materially changes how your data is handled.' (Terms section 9)"
+    evidence:
+    - source: https://www.plyrium.com/privacy
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: '4.1 Hosting and infrastructure Vercel, Inc. - hosts the application and serves the CDN ... Supabase, Inc. - hosts our Postgres database ... Hosted in the United States (us-east-1).'
+    - source: https://www.plyrium.com/terms
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'The current list of sub-processors is documented in our Privacy Policy and includes Stripe (payments), Anthropic (LLM), Vapi (AI voice telephony ...), Google (...), Supabase (data storage), Vercel (hosting), Resend (email delivery), Quo (...), and Sentry (error monitoring).'
+    note: A named, purpose-annotated vendor table with per-vendor data scope - the substance of a subprocessor list, carried inside the privacy policy rather than at a /legal/subprocessors URL (which 307s to login).
+  data_residency:
+    url: https://www.plyrium.com/privacy
+    regions: [us]
+    evidence:
+    - source: https://www.plyrium.com/privacy
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'Supabase, Inc. - hosts our Postgres database ... Hosted in the United States (us-east-1).'
+    - source: https://www.plyrium.com/privacy
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'Geo-fencing at the edge - production traffic is restricted to the U.S. and Canada'
+    - source: https://www.plyrium.com/privacy
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: '13. International Data Transfers Plyrium is operated from the United States. If you access the Service from outside the U.S., your data will be transferred to and processed in the U.S.'
+    note: A single-region statement (US, us-east-1) with an edge geo-fence to US+Canada; no region selection is offered. MiniMax TTS is disclosed as running in Vapi's worldwide region, an exception the policy itself names.
+  incident_notification:
+    url: https://www.plyrium.com/privacy
+    section: '9. Security'
+    stated_sla: 'we will notify you within 72 hours of confirmation, in accordance with applicable law'
+    evidence:
+    - source: https://www.plyrium.com/privacy
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'No system is perfectly secure. If we discover a breach affecting your data, we will notify you within 72 hours of confirmation, in accordance with applicable law.'
+    note: A customer-facing breach-notice commitment in the privacy policy; no DPA is reachable anonymously (/legal/dpa and /dpa 307 to login).
+  global_privacy_control:
+    honored: true
+    url: https://www.plyrium.com/privacy
+    section: "'2.7 Marketing analytics' and '11. Cookie inventory'"
+    evidence:
+    - source: https://www.plyrium.com/privacy
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'Browsers that send the Global Privacy Control signal are auto-declined without showing the banner.'
+    - source: https://www.plyrium.com/privacy
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'when consent is denied (or undecided, or the browser sends Global Privacy Control), the scripts load but do not drop their third-party cookies and do not send identifying data to the platforms.'
+    note: Set from the published statement only; no Sec-GPC header was sent to test it. Scope as stated is the marketing site's Meta Pixel and Google Ads measurement.
+  exit_assistance:
+    url: https://www.plyrium.com/terms
+    section: "'11. Termination' (Terms) and '6. Data Retention' / '7. Your Rights' (Privacy)"
+    stated_period: 'Your data is retained for 90 days after termination, then permanently deleted, except billing records (retained 7 years for tax) and any data subject to legal hold'
+    formats: [CSV, JSON]
+    evidence:
+    - source: https://www.plyrium.com/terms
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'Upon termination: ... You may export your data via your dashboard or by contacting us. Your data is retained for 90 days after termination, then permanently deleted, except billing records (retained 7 years for tax) and any data subject to legal hold'
+    - source: https://www.plyrium.com/privacy
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'Portability: request your data in a machine-readable format (CSV/JSON exports are available from the dashboard)'
+    note: Self-service export in machine-readable formats plus a stated post-termination retention window; there is no documented migration/switching assistance beyond export, and the API surface (VouchSpec) has nothing to export - receipts are already public bytes.
+  ai_transparency:
+    url: https://www.plyrium.com/privacy
+    section: "'10. AI Voice Disclosure' (Privacy) and the homepage safeguards list"
+    evidence:
+    - source: https://www.plyrium.com/privacy
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'The Federal Communications Commission ruled in February 2024 (FCC-24-17) that AI-generated voices ... qualify as "artificial or prerecorded voice" under the TCPA. The Service uses neural text-to-speech voices for the AI Voice Receptionist. If a caller asks whether they are speaking with an AI or a human, the receptionist is configured to truthfully identify itself'
+    - source: https://www.plyrium.com/
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: "Won't lie when asked If a caller asks 'am I talking to a real person?' the AI answers truthfully - every time. Two-party recording disclosure on every call."
+    - source: https://www.plyrium.com/terms
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'Anthropic (our LLM provider) is contracted in zero-retention mode for our API calls.'
+    note: >-
+      A published AI-interaction disclosure commitment (the voice agent identifies itself as AI on request), the
+      list of AI vendors and their no-train/zero-retention terms, and the homepage's "What the AI never does without
+      your sign-off" list. This is interaction transparency, not a training-data summary or model card.

@@ -1,0 +1,80 @@
+generated: '2026-09-19'
+method: derived
+source: openapi/plyrium-com-vouchspec-openapi.yml (components.schemas ValidationRequest, PaidValidationAccess, IssuerKey, Error; path parameters) with route templates and lifecycle states from https://vouchspec.plyrium.com/api/vouchspec/v1/discovery and the repository README
+description: >-
+  Entity graph of the VouchSpec commerce API. The public OpenAPI names four schemas; the discovery document adds the
+  entities that live behind the credentialed routes (Order, Result) and the content-addressed Receipt with its separate
+  Status. Identifiers are content digests and opaque tokens rather than prefixed ids.
+identifiers:
+- entity: Receipt
+  id: 'sha256_hex - lowercase SHA-256 of the exact DSSE envelope bytes (^[0-9a-f]{64}$), without the sha256: prefix'
+- entity: IssuerKey
+  id: key_id - RFC 7638 JWK thumbprint (observed m3Vz2bX1-lZ-osJb91mHCNE_-Lehx2fFc2TvExDbbn0), "only a lookup hint"
+- entity: Order
+  id: order_id - opaque, appears in route templates /api/vouchspec/v1/orders/{order_id}; repository examples use an ord_ prefix (ord_01b1e85f...)
+- entity: ValidationRequest
+  id: delivery_id - client-chosen ^[A-Za-z0-9_-]{8,64}$, the idempotent-recovery handle
+- entity: Source
+  id: (host, owner, repository, commit, skill_path) - host const github.com, commit ^[0-9a-f]{40}$
+- entity: catalog receipt (Stage A index)
+  id: receipt ID with cpr_ prefix (README example cpr_2bb3259dd33d0cbadf7580dc) - the static catalog, not this API
+entities:
+- name: ValidationRequest
+  schema: '#/components/schemas/ValidationRequest'
+  fields: ['schema_version (const 1.0.0)', 'operation (const fresh_public_static_validation)', 'source', 'profile (const vouchspec-public-static-v1)', 'max_price {currency const usd, amount_minor 25-1000000}', 'delivery_id']
+- name: Source
+  embedded_in: ValidationRequest.source
+  fields: [host (const github.com), owner, repository, commit, skill_path]
+- name: PaidValidationAccess
+  schema: '#/components/schemas/PaidValidationAccess'
+  fields: ['schema_version (const 1.0.0)', 'order', 'credentials {tenant_api_key, delivery_token, delivery_token_expires_at, notice}', 'endpoints', 'payment']
+- name: Order
+  source: discovery api.order_template / result_template / rotate_delivery_template / revoke_delivery_template (not in the OpenAPI)
+  fields: [order_id, state (order / payment / fulfillment / delivery / remedy tracked independently per payment-flow.md)]
+- name: Receipt
+  media_type: application/vnd.dsse.envelope.v1+json
+  fields: ['payloadType', 'payload (inner receipt JSON - source coordinates, content digest, checks, evidence labels, limitations, timestamps)', 'signatures[] {keyid, sig}']
+  evidence_labels: [DIGEST_PINNED, STRUCTURE_VALIDATED, STATIC_INSPECTION_COMPLETED, INDEPENDENT_STATIC_SCAN]
+  reserved_labels: [PUBLISHER_CI_ATTESTED, SANDBOX_BEHAVIOR_OBSERVED, TASK_EVALUATED]
+- name: ReceiptStatus
+  route: /api/vouchspec/v1/receipts/{sha256_hex}/status (no-store)
+  states: [CURRENT, SUPERSEDED, EXPIRED, REVOKED_EVALUATOR_DEFECT, REVOKED_KEY_COMPROMISE, SIGNATURE_VALID_LIFECYCLE_UNKNOWN]
+- name: IssuerKey
+  schema: '#/components/schemas/IssuerKey'
+  fields: ['schema_version (const 1.0)', 'key_id', 'algorithm (const Ed25519)', 'public_key_jwk {kty OKP, crv Ed25519, x}', 'use']
+- name: Error
+  schema: '#/components/schemas/Error'
+  fields: ['error {code, message}']
+relationships:
+- from: ValidationRequest
+  to: Source
+  type: has_one
+  via: source
+- from: ValidationRequest
+  to: Order
+  type: creates
+  via: purchaseExactCommitValidation 200 -> PaidValidationAccess.order
+- from: PaidValidationAccess
+  to: Order
+  type: has_one
+  via: order + endpoints (order/result/rotate/revoke templates)
+- from: Order
+  to: Receipt
+  type: has_one
+  via: result endpoint delivers the DSSE bytes; the same bytes are published at /receipts/{sha256_hex}
+- from: Receipt
+  to: ReceiptStatus
+  type: has_one
+  via: sha256_hex (same path parameter, /status suffix)
+- from: Receipt
+  to: IssuerKey
+  type: belongs_to
+  via: signatures[].keyid = IssuerKey.key_id
+- from: Receipt
+  to: Source
+  type: belongs_to
+  via: inner receipt binds owner/repository/commit/skill_path and content digest
+- from: Order
+  to: Payment
+  type: has_one
+  via: PaidValidationAccess.payment (x402 settlement; one settlement record per order)

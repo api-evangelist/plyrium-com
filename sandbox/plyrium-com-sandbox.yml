@@ -1,0 +1,48 @@
+generated: '2026-09-19'
+method: searched
+source: https://www.plyrium.com/vouchspec/policies
+sources:
+- https://www.plyrium.com/vouchspec/policies ("Test environment")
+- https://www.plyrium.com/vouchspec ("A separate, free Base Sepolia sandbox exists at vouchspec-sandbox.plyrium.com")
+- https://vouchspec-sandbox.plyrium.com/api/vouchspec/v1/discovery (probed 2026-09-19, HTTP 200, schema_version 1.1.0, stage B_PUBLIC_X402_SANDBOX)
+- https://vouchspec-sandbox.plyrium.com/api/vouchspec/v1/health (probed 2026-09-19, HTTP 200, environment sandbox)
+- https://raw.githubusercontent.com/mordiaky/vouchspec/main/docs/payment-flow.md
+description: >-
+  A separate managed sandbox host that exercises the complete x402 flow - onchain settlement, isolated fulfillment,
+  signing, public receipt caching and live invalidation - with test USDC on Base Sepolia, "without creating revenue".
+  The provider states it is excluded from customer, request and traction metrics. No test cards, test keys or
+  fixtures exist because the API has no card or key model; the test dimension is the payment NETWORK.
+environments:
+- name: live
+  base_url: https://vouchspec.plyrium.com
+  network: eip155:8453 (Base mainnet)
+  asset: USDC
+  amount: '0.25'
+  terms_version: vouchspec-stage-b-mainnet-2026-07-15
+  policy_url: https://www.plyrium.com/vouchspec/policies
+- name: sandbox
+  base_url: https://vouchspec-sandbox.plyrium.com
+  network: eip155:84532 (Base Sepolia)
+  asset: test USDC
+  amount: '1.00'
+  atomic_amount: '1000000'
+  testnet_settlement_available: true
+  mainnet_settlement_available: false
+  counts_for_goal: false
+  environment: test
+  terms_version: vouchspec-stage-b-2026-07-14
+  policy_url: https://vouchspec-sandbox.plyrium.com/vouchspec/policies
+  reachability:
+    discovery: 200
+    health: 200
+    openapi_json: 401 (HTML shell)
+    llms_txt: 401
+    well_known: 401 on every path
+    note: only the discovery and health routes are open on the sandbox host; use the live host's OpenAPI (the contract is the same) with the sandbox base URL and network.
+how_to_switch: Change the base URL to https://vouchspec-sandbox.plyrium.com and pay the 402 challenge it returns (eip155:84532, 1000000 atomic test USDC). The request body, headers and receipt verification are identical; the sandbox has its own issuer key, so fetch /api/vouchspec/v1/keys/issuer from the sandbox host.
+test_values:
+  cards: none - no card rail exists
+  api_keys: none - credentials are issued only after a settled (test) payment
+  fixtures: the live 402 body's extensions.bazaar.info.input.body is a complete example request (owner mordiaky, repository vouchspec-demo, commit 344558d51ecae7929c50b7cff94e120bfca53807, skill_path skills/hello-vouchspec) published by the provider; docs/examples/fresh-validation-request.json in the repo is the same shape
+  time_simulation: none
+hosted_proof: docs/payment-flow.md records an owner-controlled sandbox order on 2026-07-14 settling 1.00 test USDC on Base Sepolia and delivering a signed receipt - marked counts_for_goal false by the provider.

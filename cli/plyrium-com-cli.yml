@@ -1,0 +1,48 @@
+generated: '2026-09-19'
+method: searched
+source: https://github.com/mordiaky/vouchspec
+sources:
+- https://raw.githubusercontent.com/mordiaky/vouchspec/main/pyproject.toml ([project.scripts] vouchspec = capabilityproof.cli:main, capabilityproof = capabilityproof.cli:main)
+- https://raw.githubusercontent.com/mordiaky/vouchspec/main/README.md ("Verify a public receipt independently")
+- https://raw.githubusercontent.com/mordiaky/vouchspec/main/docs/methodology.md (inspect / inspect-git commands)
+- https://raw.githubusercontent.com/mordiaky/vouchspec/main/distribution/github-action/README.md (the action runs inspect-git)
+- https://raw.githubusercontent.com/mordiaky/vouchspec/main/CHANGELOG.md (lifecycle draft/publish/evaluate/export and secret-environment provisioning commands)
+description: >-
+  A first-party Python CLI, `vouchspec` (alias `capabilityproof`), shipped inside the VouchSpec repository. Its
+  buyer-facing job is offline verification of a receipt against the published issuer key and root-signed
+  lifecycle feed; its publisher-facing job is local inspection of a skill directory or exact Git commit. It is
+  not distributed through PyPI (probed 404), so the install path is from source.
+name: vouchspec
+aliases: [capabilityproof]
+install:
+- method: from source
+  command: null
+  note: pyproject.toml (setuptools, requires-python >=3.11, deps cryptography 49.0.0, jsonschema 4.26.0, mcp 1.28.1, PyYAML 6.0.3, stripe 15.3.0). No install command is published in the README; pip/pipx from the repository is the implied route and is deliberately not written here as a verbatim instruction.
+- method: GitHub Action (CI wrapper)
+  command: 'uses: mordiaky/vouchspec/distribution/github-action@ed812a14cbc62333d59bac319f79d897f14d1b64'
+  note: creates an isolated Python 3.11 environment and runs `inspect-git` against the checked-out commit
+commands:
+- group: verification (buyer side)
+  commands:
+  - name: verify
+    usage: vouchspec verify <receipt.dsse.json> --key <issuer.jwk.json> --lifecycle <lifecycle.dsse.json> --root-key <root.jwk.json>
+    description: Authenticates the exact decoded receipt bytes before parsing JSON, validates the receipt schema and inner consistency digest, then optionally applies the root-signed lifecycle feed. Results are CURRENT, SUPERSEDED, EXPIRED, REVOKED_EVALUATOR_DEFECT, REVOKED_KEY_COMPROMISE or SIGNATURE_VALID_LIFECYCLE_UNKNOWN.
+    source: README.md "Verify a public receipt independently"
+- group: inspection (publisher / local)
+  commands:
+  - name: inspect
+    description: Static evidence scan of one local directory containing SKILL.md (bounded inventory, structure, references, static review, receipt draft). Never executes artifact content.
+    source: docs/methodology.md
+  - name: inspect-git
+    description: Same scan against exact repository bytes at a full 40-character commit; what the GitHub Action runs.
+    source: docs/methodology.md, distribution/github-action/README.md
+- group: operator (documented in CHANGELOG, signatures not published)
+  commands:
+  - name: paid-receipt lifecycle draft / publish / evaluate / export
+    description: Offline-root lifecycle commands with supersession, revocation and key-compromise controls.
+  - name: tenant provisioning / loopback service
+    description: Secret-environment commands for local tenant provisioning and loopback service operation (sandbox).
+key_flows:
+- Verify a receipt you were handed: fetch the issuer JWK from https://vouchspec.plyrium.com/api/vouchspec/v1/keys/issuer, run `vouchspec verify` on the exact bytes, then GET /receipts/{sha256_hex}/status live - the CLI verifies signature and schema; only the API knows current invalidation.
+- Publisher pre-check: run inspect-git on the exact commit you intend to release, or let the pinned GitHub Action do it and attest the outputs.
+binary_distribution: packages/plyrium-com-packages.yml

@@ -1,0 +1,138 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  https://vouchspec.plyrium.com/api/vouchspec/v1/discovery (authentication, acquisition, request, payment,
+  fulfillment, result blocks) cross-read with openapi/plyrium-com-vouchspec-openapi.yml and the observed
+  responses of 2026-09-19 (402 challenge, 404 and 422 envelopes, Cache-Control and Link headers), plus
+  docs/payment-flow.md and docs/refund-policy.md in https://github.com/mordiaky/vouchspec and
+  https://www.plyrium.com/vouchspec/policies.
+description: >-
+  Cross-cutting runtime semantics of the VouchSpec Agent Skill Evidence API: an anonymous read surface, one
+  x402-paid write, strict schema-checked JSON requests, a {error:{code,message}} envelope, content-addressed
+  immutable receipts with a separate no-store status, and payment-bound replay protection.
+
+base_url: https://vouchspec.plyrium.com
+api_style: REST over HTTPS, JSON requests (strict, additionalProperties false, duplicate keys rejected), JSON responses; one DSSE media type
+surface_shape:
+  read_operations: 7 (anonymous)
+  write_operations: 1 (purchaseExactCommitValidation, x402-paid)
+
+authentication:
+  scheme: none on reads; x402 v2 payment challenge on the write; post-settlement bearer tenant key + X-VouchSpec-Delivery-Token for order/result
+  detail: authentication/plyrium-com-authentication.yml
+
+idempotency:
+  supported: true
+  coverage: partial
+  scope: [purchaseExactCommitValidation]
+  mechanism: >-
+    Three cooperating mechanisms rather than a single universal header. (1) Payment binding: discovery states
+    acquisition.exact_payment_retries_return_same_credentials true and the product page states "Durable x402
+    claims prevent replay and concurrent settlement" - retrying the identical paid request returns the same
+    credentials instead of charging twice. (2) delivery_id: a required client-chosen ^[A-Za-z0-9_-]{8,64}$ value
+    in the request body that the provider's own skill calls "a non-secret, stable delivery_id for idempotent
+    recovery". (3) Idempotency-Key header: documented in discovery authentication.idempotency_header
+    ("Idempotency-Key: {unique_8_to_128_character_value}") for the authenticated tenant operations
+    (quotes/orders in payment-flow.md), which are NOT in the public OpenAPI.
+  why_partial: >-
+    The one public write IS protected against double-charging, but the Idempotency-Key header is not declared
+    on it in the OpenAPI, and the endpoints that document that header are outside the published contract. An
+    agent reading the spec alone sees delivery_id and the 402/200 flow, not a universal replay header.
+  key_format: Idempotency-Key 8-128 characters; delivery_id 8-64 chars [A-Za-z0-9_-]
+  retention: not stated
+  conflict_behavior: not stated for Idempotency-Key; for payment, an exact retry returns the same credentials
+  docs: https://vouchspec.plyrium.com/api/vouchspec/v1/discovery
+
+dry_run:
+  supported: true
+  mechanism: >-
+    POST /api/vouchspec/v1/validate WITHOUT a PAYMENT-SIGNATURE returns 402 and the canonical challenge with no side
+    effect - the OpenAPI says "An exactly empty unpaid probe is also accepted for challenge discovery", and GET
+    /api/vouchspec/v1/validate "never verifies or settles a payment" (x-vouchspec-side-effects: None). An agent can
+    rehearse the full request (schema validation happens before payment: a malformed body returned 422) and read
+    the exact price, network, payTo and expiry before authorising anything.
+  observed: 2026-09-19 - empty POST -> 402 + PAYMENT-REQUIRED; malformed POST -> 422 invalid_commerce_request; no payment was possible or made.
+  docs: https://vouchspec.plyrium.com/openapi.json#/paths/~1api~1vouchspec~1v1~1validate/post
+
+reversibility:
+  status: documented
+  write_surface:
+  - operation: purchaseExactCommitValidation
+    effect: settles 0.25 USDC on Base mainnet and queues an isolated validation job
+    reversal_operation: null
+    reversal_mechanism: >-
+      No API operation reverses a purchase. x402 has no refund object; VouchSpec documents an automatic "remedy" -
+      a new fixed-amount USDC transfer back to the payer address proven by the original authorization - triggered
+      by the provider for objective failures only.
+    conditions: >-
+      Refund is due for: a duplicate charge; a settled payment where the job never starts because of a VouchSpec
+      failure; a job that fails before a signed receipt is produced; an unsupported request accepted because of a
+      VouchSpec validation defect; a delivered receipt with an invalid signature or wrong source/commit/path/digest
+      after one automatic rerun. NOT refundable: an accurate failure or unfavourable static finding ("An accurate
+      failure is the purchased result").
+    window: not stated - no time limit or claim deadline is published for the buyer; the docs describe the provider's own 23-hour retry cutoff before Coinbase's 24-hour idempotency window, which is an internal control, not a buyer window
+    docs:
+    - https://www.plyrium.com/vouchspec/policies (Refund conditions)
+    - https://github.com/mordiaky/vouchspec/blob/main/docs/refund-policy.md
+  - operation: delivery token rotate / revoke (route templates rotate_delivery_template, revoke_delivery_template in discovery; not in the OpenAPI)
+    effect: rotates or immediately revokes the order-specific delivery capability
+    window: delivery capabilities expire after 30 days (payment-flow.md)
+  receipt_lifecycle: >-
+    Receipt bytes are immutable and never reversed; invalidation is expressed only through the separate no-store
+    /receipts/{sha256_hex}/status resource (CURRENT, SUPERSEDED, EXPIRED, REVOKED_EVALUATOR_DEFECT,
+    REVOKED_KEY_COMPROMISE) - a reader must re-check status before every reliance decision.
+  grade_basis: a reversal path (automatic remedy) is documented with objective conditions, but no buyer-side window is stated, so this is `documented`, not `verified`.
+
+pagination:
+  style: none
+  note: No list operations; receipts are addressed by content digest.
+
+field_expansion:
+  supported: false
+
+request_conventions:
+  content_type: application/json
+  maximum_bytes: 16384 (413 TooLarge)
+  duplicate_json_keys: rejected
+  schema: strict - additionalProperties false throughout ValidationRequest; const values pin schema_version 1.0.0, operation fresh_public_static_validation, profile vouchspec-public-static-v1, host github.com, currency usd
+  price_ceiling: max_price.amount_minor integer 25-1000000 (USD cents) - the buyer's own spending ceiling, checked against the 0.25 USDC quote
+
+request_tracing:
+  request_id_header: none observed
+  note: Responses carry Vercel x-vercel-id only; no provider request-id header is documented.
+
+versioning:
+  scheme: uri-path
+  current: v1 (/api/vouchspec/v1/)
+  document_versions: OpenAPI info.version 0.1.0; discovery schema_version 1.3.0; request schema_version 1.0.0; service version 0.6.0 (health); terms version vouchspec-stage-b-mainnet-2026-07-15
+  detail: lifecycle/plyrium-com-lifecycle.yml
+  changelog: changelog/plyrium-com-changelog.yml
+
+error_envelope:
+  media_type: application/json
+  shape: '{"error": {"code": "<snake_case>", "message": "<text>"}}'
+  observed_codes: [payment_required (402), not_found (404), invalid_commerce_request (422)]
+  spec_declared_statuses: [400, 402, 403, 404, 413, 429, 503]
+  rfc9457: false
+  detail: errors/plyrium-com-problem-types.yml
+
+rate_limit_signaling:
+  status_on_exhaustion: 429 (components.responses.RateLimited)
+  headers: none documented or observed (no RateLimit-*, X-RateLimit-* or Retry-After on any probed response)
+  detail: rate-limits/plyrium-com-rate-limits.yml
+
+caching:
+  discovery_openapi_llms_card_issuer_key: 'Cache-Control: public, max-age=300'
+  health_and_status: 'Cache-Control: no-store'
+  receipts: "'public, max-age=31536000, immutable' per discovery result.receipt_cache_control - receipt bytes are shareable and cacheable; status must never be cached"
+  link_relations: discovery emits RFC 8288 Link headers - rel="verification-key", rel="service-desc" (OpenAPI), rel="describedby" (llms.txt), rel="ai-catalog"
+
+payment:
+  protocol: x402 v2, scheme exact, eip155:8453, USDC 0.25 (250000 atomic), facilitator https://api.cdp.coinbase.com/platform/v2/x402
+  headers: PAYMENT-REQUIRED (402 response), PAYMENT-SIGNATURE (paid retry request), PAYMENT-RESPONSE (200 response)
+  human_checkout: false
+  sandbox: vouchspec-sandbox.plyrium.com - 1.00 test USDC on eip155:84532 (Base Sepolia); see sandbox/plyrium-com-sandbox.yml
+
+delivery:
+  model: asynchronous - 200 returns credentials + order/result endpoints; poll the order, honour Retry-After, expected_delivery_minutes 10
+  result: application/vnd.dsse.envelope.v1+json; the same bytes are published at /receipts/{sha256_hex} without credentials

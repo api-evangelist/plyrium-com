@@ -1,23 +1,179 @@
 aid: plyrium-com
 name: Plyrium
-description: 'Plyrium is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry)
-  and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  Plyrium is a contractor operating system for home-service businesses (HVAC, plumbing, electrical,
+  roofing) built in Coolidge, Arizona - AI phone answering, scheduling, quotes, invoicing with Stripe
+  payments and Google Business Profile automation. Its public API surface is VouchSpec, an agent-only
+  service on vouchspec.plyrium.com that sells fresh static validation and Ed25519-signed DSSE evidence
+  for one exact public GitHub Agent Skill commit, paid per request in USDC over x402 on Base, and
+  discoverable through an OpenAPI 3.1 contract, llms.txt, an A2A agent card, a remote MCP server, an
+  installable Agent Skill and an ARD ai-catalog.
 url: https://raw.githubusercontent.com/api-evangelist/plyrium-com/refs/heads/main/apis.yml
+image: https://www.plyrium.com/brand/plyrium-icon-rounded-1024.png
 x-type: company
 x-source: harvest:a2a-registry
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enrichment pass local-v3 (agent card, OpenAPI, MCP, llms.txt, skill all provider-published)
 specificationVersion: '0.20'
 created: '2026-09-19'
 modified: '2026-09-19'
 tags:
 - Company
-apis: []
+- Agent Skills
+- Supply Chain Security
+- Software Provenance
+- x402
+- Agentic Commerce
+- A2A
+- MCP
+- Field Service
+- Home Services
+apis:
+- aid: plyrium-com:vouchspec-agent-skill-evidence-api
+  name: VouchSpec Agent Skill Evidence API
+  description: >-
+    Agent-only API for purchasing fresh, isolated static validation and signed evidence for one exact
+    immutable public GitHub Agent Skill commit. Free anonymous discovery and verification operations
+    (health, discovery, x402 manifest, issuer key, immutable DSSE receipt bytes, live receipt status) plus
+    one x402-paid purchase operation settling 0.25 USDC on Base mainnet (eip155:8453). No human checkout,
+    no uploads, no private repositories; artifact code is never executed.
+  image: https://www.plyrium.com/brand/plyrium-icon-rounded-1024.png
+  humanURL: https://www.plyrium.com/vouchspec
+  baseURL: https://vouchspec.plyrium.com
+  tags:
+  - Agent Skills
+  - Supply Chain Security
+  - Software Provenance
+  - x402
+  - Signed Receipts
+  properties:
+  - type: OpenAPI
+    url: openapi/plyrium-com-vouchspec-openapi.yml
+  - type: OpenAPI
+    url: https://vouchspec.plyrium.com/openapi.json
+    name: Provider-hosted OpenAPI 3.1 (alias at /.well-known/openapi.json)
+  - type: Documentation
+    url: https://www.plyrium.com/vouchspec
+  - type: APIReference
+    url: https://vouchspec.plyrium.com/openapi.json
+  - type: GettingStarted
+    url: https://vouchspec.plyrium.com/.well-known/skills/vouchspec-verify-before-install/SKILL.md
+  - type: Discovery
+    url: https://vouchspec.plyrium.com/api/vouchspec/v1/discovery
+  - type: TermsOfService
+    url: https://www.plyrium.com/vouchspec/policies
+  - type: LLMsTxt
+    url: llms/plyrium-com-llms.txt
+  - type: MCPServer
+    url: mcp/plyrium-com-mcp.yml
+  - type: ToolCrosswalk
+    url: mcp/plyrium-com-tool-crosswalk.yml
+  - type: AgentCard
+    url: a2a/plyrium-com-a2a.yml
+  - type: AICatalog
+    url: well-known/plyrium-com-ai-catalog.json
+  - type: Overlay
+    url: overlays/plyrium-com-vouchspec-overlay.yaml
+  - type: ErrorCatalog
+    url: errors/plyrium-com-problem-types.yml
+  - type: DataModel
+    url: data-model/plyrium-com-data-model.yml
+  - type: Sandbox
+    url: sandbox/plyrium-com-sandbox.yml
+  - type: GitHub
+    url: https://github.com/mordiaky/vouchspec
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: AgenticAccess
+  url: agentic-access/plyrium-com-agentic-access.yml
+- type: DomainSecurity
+  url: security/plyrium-com-domain-security.yml
 - type: Website
   url: https://plyrium.com/
+- type: Pricing
+  url: https://www.plyrium.com/pricing
+- type: TermsOfService
+  url: https://www.plyrium.com/terms
+- type: PrivacyPolicy
+  url: https://www.plyrium.com/privacy
+- type: Blog
+  url: https://www.plyrium.com/blog
+- type: Support
+  url: https://www.plyrium.com/contact
+- type: HelpCenter
+  url: https://www.plyrium.com/kb
+- type: Login
+  url: https://www.plyrium.com/login
+- type: GitHub
+  url: https://github.com/mordiaky
+- type: LinkedIn
+  url: https://www.linkedin.com/company/plyrium
+- type: X (Twitter)
+  url: https://x.com/plyrium
+- type: Facebook
+  url: https://www.facebook.com/plyrium
+- type: Instagram
+  url: https://www.instagram.com/plyrium
+- type: WellKnown
+  url: well-known/plyrium-com-well-known.yml
+- type: AICatalog
+  url: well-known/plyrium-com-ai-catalog.json
+- type: LLMsTxt
+  url: llms/plyrium-com-llms.txt
+- type: MCPServer
+  url: mcp/plyrium-com-mcp.yml
+- type: AgentCard
+  url: a2a/plyrium-com-a2a.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Packages
+  url: packages/plyrium-com-packages.yml
+- type: CLI
+  url: cli/plyrium-com-cli.yml
+- type: Conformance
+  url: conformance/plyrium-com-conformance.yml
+- type: ErrorCatalog
+  url: errors/plyrium-com-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/plyrium-com-lifecycle.yml
+- type: ChangeLog
+  url: changelog/plyrium-com-changelog.yml
+- type: ChangeLog
+  url: https://github.com/mordiaky/vouchspec/blob/main/CHANGELOG.md
+- type: Conventions
+  url: conventions/plyrium-com-conventions.yml
+- type: Idempotency
+  url: conventions/plyrium-com-conventions.yml
+- type: Sandbox
+  url: sandbox/plyrium-com-sandbox.yml
+- type: Plans
+  url: plans/plyrium-com-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/plyrium-com-rate-limits.yml
+- type: DataModel
+  url: data-model/plyrium-com-data-model.yml
+- type: Overlay
+  url: overlays/plyrium-com-vouchspec-overlay.yaml
+- type: DataSubjectRequest
+  url: https://www.plyrium.com/privacy
+- type: Subprocessors
+  url: https://www.plyrium.com/privacy
+- type: DataResidency
+  url: https://www.plyrium.com/privacy
+- type: IncidentNotification
+  url: https://www.plyrium.com/privacy
+- type: GlobalPrivacyControl
+  url: https://www.plyrium.com/privacy
+- type: ExitAssistance
+  url: https://www.plyrium.com/terms
+- type: AITransparency
+  url: https://www.plyrium.com/privacy
+x-enrichment:
+  date: '2026-09-19'
+  status: enriched
+  artifacts_added: 31
+  pass: local-v3

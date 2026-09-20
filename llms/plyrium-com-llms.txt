@@ -1,0 +1,31 @@
+# VouchSpec
+
+> Agent-only, x402-paid fresh static validation and signed evidence for one exact immutable public GitHub Agent Skill commit.
+
+VouchSpec accepts public github.com coordinates pinned to a 40-character commit and a skill subdirectory. It does not accept uploads, private repositories, branches, or tags. The service never executes artifact code. A validation costs 0.25 USDC on eip155:8453. There is no human or card checkout.
+
+Purchase flow: POST the strict JSON request described by the OpenAPI document to https://vouchspec.plyrium.com/api/vouchspec/v1/validate. The first unpaid request returns an x402 v2 HTTP 402 challenge. Authorize exactly that challenge, then retry the identical request with the PAYMENT-SIGNATURE header. A successful settlement returns one-time tenant and delivery bearer credentials.
+
+Receipts contain immutable DSSE envelope bytes. Agents may cache and share those exact bytes, but must verify the issuer signature and fetch the separate live receipt status before every new reliance decision.
+
+## Machine contracts
+
+- [OpenAPI JSON](https://vouchspec.plyrium.com/openapi.json): HTTP operations, request schema, x402 challenge headers, response shapes, and receipt verification endpoints.
+- [ARD AI catalog](https://vouchspec.plyrium.com/.well-known/ai-catalog.json): Draft Agentic Resource Discovery entries for the A2A agent and paid OpenAPI capability.
+- [Installable Agent Skill](https://vouchspec.plyrium.com/.well-known/skills/vouchspec-verify-before-install/SKILL.md): Verify-before-install workflow that can discover and purchase fresh VouchSpec evidence.
+- [Agent Skill index](https://vouchspec.plyrium.com/.well-known/skills/index.json): Well-known index for compatible agent skill installers.
+- [Canonical discovery](https://vouchspec.plyrium.com/api/vouchspec/v1/discovery): Current service, authentication, payment, fulfillment, and reliance contract.
+- [x402 manifest](https://vouchspec.plyrium.com/.well-known/x402): Paid endpoint and current x402 network requirements.
+- [A2A Agent Card](https://vouchspec.plyrium.com/.well-known/agent-card.json): Read-only A2A discovery skill.
+- [Remote MCP](https://vouchspec.plyrium.com/api/vouchspec/v1/mcp): Read-only Streamable HTTP discovery tool.
+- [Issuer key](https://vouchspec.plyrium.com/api/vouchspec/v1/keys/issuer): Current public Ed25519 receipt-verification key.
+
+## Purchase and verification
+
+- [Paid validation intake](https://vouchspec.plyrium.com/api/vouchspec/v1/validate): POST a strict exact-commit request; the unpaid response supplies the canonical x402 challenge.
+- [Policies](https://www.plyrium.com/vouchspec/policies): Terms, accepted inputs, receipt reliance, invalidation, and refund/remedy policy.
+
+## Optional
+
+- [Product documentation](https://www.plyrium.com/vouchspec): Human-readable background; agents should prefer the machine contracts above.
+- [Public source](https://github.com/mordiaky/vouchspec): VouchSpec source and release history.

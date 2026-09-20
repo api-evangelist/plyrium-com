@@ -1,0 +1,54 @@
+generated: '2026-09-19'
+method: searched
+source: https://github.com/mordiaky/vouchspec
+sources:
+- https://registry.npmjs.org/-/v1/search?text=vouchspec (0 results) and ?text=plyrium (0 results), probed 2026-09-19
+- https://pypi.org/pypi/vouchspec/json (404) and https://pypi.org/pypi/capabilityproof/json (404), probed 2026-09-19
+- https://raw.githubusercontent.com/mordiaky/vouchspec/main/pyproject.toml (project name capabilityproof, version 0.2.0)
+- https://raw.githubusercontent.com/mordiaky/vouchspec/main/distribution/github-action/README.md
+- https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.mordiaky%2Fvouchspec
+description: >-
+  Plyrium publishes no client SDK on any package registry (npm, PyPI, Maven, NuGet, Go, RubyGems, Packagist and
+  crates.io all searched by name; none hold a vouchspec or plyrium package). What it does distribute is (a) a
+  GitHub Action for publisher CI, pinned by commit SHA rather than a registry version, (b) the VouchSpec source
+  package itself, installable only from the repository, and (c) an MCP Registry entry, which is a pointer to the
+  hosted server rather than a package. None of these is a client library, so no SDKs pointer is emitted.
+packages:
+- language: yaml
+  kind: github-action
+  registry: github-actions
+  name: mordiaky/vouchspec/distribution/github-action
+  url: https://github.com/mordiaky/vouchspec/tree/main/distribution/github-action
+  install: 'uses: mordiaky/vouchspec/distribution/github-action@ed812a14cbc62333d59bac319f79d897f14d1b64'
+  official: true
+  version: ed812a14cbc62333d59bac319f79d897f14d1b64
+  published: '2026-07-16'
+  note: >-
+    Distributed by immutable commit pin, not a semver tag; the README instructs "Pin the action by full commit SHA".
+    `published` is the repository's last push date (pushed_at 2026-07-16T02:23:47Z), the closest dated signal for a
+    SHA-pinned distribution. Emits receipt.json + publisher-ci-request.json for GitHub artifact attestation.
+- language: python
+  kind: source-package
+  registry: none
+  name: capabilityproof
+  url: https://github.com/mordiaky/vouchspec
+  install: null
+  official: true
+  version: 0.2.0
+  published: null
+  note: >-
+    pyproject.toml declares name capabilityproof, version 0.2.0, requires-python >=3.11, console_scripts `vouchspec`
+    and `capabilityproof` (see cli/). Not on PyPI (404 probed); the repository publishes no pip install line, so
+    install is recorded as null rather than guessed.
+- language: n/a
+  kind: mcp-registry-entry
+  registry: modelcontextprotocol.io
+  name: io.github.mordiaky/vouchspec
+  url: https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.mordiaky%2Fvouchspec
+  install: null
+  official: true
+  version: 0.3.0
+  published: '2026-07-15'
+  note: Remote-only entry (remotes[0] streamable-http https://vouchspec.plyrium.com/api/vouchspec/v1/mcp); no package to install. Status active, isLatest true; the superseded 0.2.0 entry pointed at the sandbox host.
+sdk_count: 0
+sdks_pointer_emitted: false

@@ -1,0 +1,68 @@
+generated: '2026-09-19'
+method: searched
+status: published
+source: https://vouchspec.plyrium.com/api/vouchspec/v1/discovery
+sources:
+- https://vouchspec.plyrium.com/api/vouchspec/v1/discovery (mcp block - transport, path, protocol_version, tools)
+- https://vouchspec.plyrium.com/llms.txt ("Remote MCP" entry)
+- https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.mordiaky%2Fvouchspec (official MCP Registry, io.github.mordiaky/vouchspec v0.3.0 isLatest, status active)
+- https://raw.githubusercontent.com/mordiaky/vouchspec/main/server.json (registry manifest, remotes[0].url)
+- https://agent-tools.cloud/api/v1/mcp/servers/vouchspec-agent-skill-evidence (third-party listing, HTTP 200)
+deployment:
+  mode: remote
+  endpoint: https://vouchspec.plyrium.com/api/vouchspec/v1/mcp
+  install: null
+  package: null
+  auth: none
+  verified: probed
+  probe:
+    fetched: '2026-09-19'
+    initialize: >-
+      200 - protocolVersion 2025-11-25, serverInfo {name: vouchspec-agent-skill-evidence, title: VouchSpec Agent
+      Skill Evidence, version: 0.2.0}, capabilities.tools.listChanged true, instructions "Return VouchSpec's public
+      machine discovery contract. This server is read-only and does not accept artifacts, fetch repositories,
+      settle payments, or expose private data."
+    tools_list: 200 - one tool returned with a full inputSchema (below); no auth challenge, response header x-plyrium-auth-bypass anonymous-public
+    tools_call: 200 - get_vouchspec_discovery returned structuredContent identical to /api/vouchspec/v1/discovery; no side effect
+    response_mode: stateless JSON (discovery says response_mode stateless_json); Accept application/json, text/event-stream honoured with a plain JSON body
+  note: >-
+    The repository also contains a stdio catalog MCP (src/capabilityproof/catalog_mcp.py, CHANGELOG 0.2.0 "read-only
+    loopback REST and stdio MCP catalog retrieval") but publishes no install command and the package is not on
+    PyPI (pypi.org/pypi/capabilityproof 404, pypi.org/pypi/vouchspec 404), so mode is recorded as remote only.
+    The MCP Registry's earlier v0.2.0 entry pointed the remote at vouchspec-sandbox.plyrium.com; v0.3.0 (isLatest)
+    moved it to the live host recorded here.
+server:
+  name: vouchspec-agent-skill-evidence
+  title: VouchSpec Agent Skill Evidence
+  version: 0.2.0
+  transport: streamable-http
+  protocol_version: '2025-11-25'
+  url: https://vouchspec.plyrium.com/api/vouchspec/v1/mcp
+  registry_name: io.github.mordiaky/vouchspec
+  registry_version: 0.3.0
+  anonymous_read_only: true
+  paid_execution_available: false
+authorship: provider
+auth:
+  methods: [none]
+  note: No OAuth, API key or protected-resource metadata; the server is anonymous by design and exposes only the discovery contract.
+tool_count: 1
+tools:
+- name: get_vouchspec_discovery
+  title: Get VouchSpec discovery
+  category: discovery
+  description: Return current agent-only pricing, x402 payment, request, receipt, and status instructions.
+  inputSchema:
+    type: object
+    properties: {}
+    additionalProperties: false
+    $schema: http://json-schema.org/draft-07/schema#
+  annotations:
+    readOnlyHint: true
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: false
+  execution:
+    taskSupport: forbidden
+  source_operation: openapi/plyrium-com-vouchspec-openapi.yml#getVouchSpecDiscovery
+  observed_output: structuredContent = the discovery document (schema_version 1.3.0) plus a text part stating no payment or validation was performed

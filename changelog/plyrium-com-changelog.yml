@@ -1,0 +1,45 @@
+generated: '2026-09-19'
+method: searched
+source: https://github.com/mordiaky/vouchspec/blob/main/CHANGELOG.md
+sources:
+- https://raw.githubusercontent.com/mordiaky/vouchspec/main/CHANGELOG.md
+- https://api.github.com/repos/mordiaky/vouchspec/releases (v0.3.0 2026-07-15T18:39:19Z, v0.2.0 2026-07-14T06:00:21Z)
+description: >-
+  VouchSpec keeps a Keep-a-Changelog-style CHANGELOG.md in its public repository. It is the only dated change
+  record; no changelog page exists on plyrium.com (www.plyrium.com/changelog 307s to /login). Recent window only.
+docs: https://github.com/mordiaky/vouchspec/blob/main/CHANGELOG.md
+versioning:
+  scheme: semver tags on the repository (v0.2.0, v0.3.0); service reports version 0.6.0 at /api/vouchspec/v1/health
+  current: 0.6.0 (service) / v0.3.0 (latest tagged release)
+current_version: 0.6.0
+entries:
+- version: Unreleased
+  date: null
+  breaking: true
+  breaking_note: Replaced the superseded $49 Stripe Checkout request contract and quote preview with the 0.25-USDC agent-only x402 contract; moved the official MCP Registry remote from the sandbox host to the live service.
+  highlights:
+  - Launched the agent-only commercial endpoint at 0.25 USDC on Base mainnet and activated the isolated fulfillment worker
+  - Publisher receipt/binding evidence preserved for structural passes AND explicit failures; GitHub Action runtime installed from a hash-locked dependency set
+  - GitHub-only exact-commit/subdirectory freezing with Git blob verification, hostile path/archive rejection, bounded intake, content-addressed manifests
+  - Pinned Docker static worker (no network, read-only FS, non-root) and a constrained exact-byte Stage B signing gate
+  - Sandbox authenticated commerce API - HMAC-digest credentials, tenant-scoped idempotency, expiring/rotatable/revocable order capabilities, bounded concurrency/body/rate/storage controls
+  - Offline-root paid-receipt lifecycle draft/publish/evaluate/export commands with irreversible supersession/revocation/key-compromise controls
+  - Stripe Checkout adapter retained for regression/research only; live HTTP intake through Stripe disabled
+- version: 0.2.0
+  date: '2026-07-13'
+  release_published: '2026-07-14'
+  breaking: false
+  highlights:
+  - Stage A alpha under the provisional public name VouchSpec
+  - 25 issuer-signed exact-version Agent Skill receipts from 12 GitHub owner namespaces plus a signed catalog index
+  - Separate recovery-root-signed lifecycle feed with expiry, revocation, monotonic sequence, rollback and equivocation detection
+  - Read-only loopback REST and stdio MCP catalog retrieval; no artifact submission route
+  - Ed25519/DSSE verification, explicit evidence labels, encrypted signing-key tooling
+  - Published signed catalog resources over GitHub-managed TLS/CORS, a commit-pinned publisher CI action and a public root/issuer JWK fingerprint Gist
+  - Deferred private repositories, uploads, authentication, tenant storage and executable sandboxing
+- version: 0.3.0
+  date: '2026-07-15'
+  breaking: false
+  highlights:
+  - Tagged release; MCP Registry io.github.mordiaky/vouchspec 0.3.0 published 2026-07-15T18:40:02Z with remote https://vouchspec.plyrium.com/api/vouchspec/v1/mcp
+  note: The tag exists on GitHub but CHANGELOG.md has no 0.3.0 heading - its content sits under Unreleased.

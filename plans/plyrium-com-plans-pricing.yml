@@ -1,0 +1,68 @@
+specification: API Commons Plans
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/Plans
+provider: Plyrium
+providerId: plyrium-com
+created: '2026-09-19'
+modified: '2026-09-19'
+generated: '2026-09-19'
+method: probed
+source: https://vouchspec.plyrium.com/api/vouchspec/v1/discovery
+sources:
+- https://vouchspec.plyrium.com/api/vouchspec/v1/discovery (payment block - machine-readable price, probed 2026-09-19)
+- https://vouchspec.plyrium.com/.well-known/x402 (accepts[].amount 250000 atomic USDC)
+- https://www.plyrium.com/vouchspec ("pays exactly $0.25 in USDC on Base mainnet")
+- https://raw.githubusercontent.com/mordiaky/vouchspec/main/PRICING.md (pricing hypotheses and cohort gates)
+- https://www.plyrium.com/pricing (Plyrium SaaS tiers - the contractor product, not the API)
+tags:
+- Agent Skills
+- x402
+- Agentic Commerce
+description: >-
+  The VouchSpec API is priced per request in USDC over x402 with no tiers, subscriptions, quotas or human
+  checkout; the price is read from the provider's machine-readable discovery document and enforced by the 402
+  challenge. Everything except a fresh validation is free. Plyrium's separate SaaS product (the contractor CRM)
+  is tiered per month and is recorded below for completeness because it is the company's Pricing page, but it
+  does not sell API access.
+plan_count: 2
+plans:
+- id: vouchspec-fresh-validation
+  name: VouchSpec fresh exact-commit validation (mainnet)
+  type: usage-based
+  audience: agents only (human_checkout false)
+  currency: USDC
+  network: eip155:8453 (Base mainnet)
+  price: '0.25'
+  atomic_amount: '250000'
+  billing: per request, settled onchain via x402 v2 exact scheme before fulfillment
+  facilitator: https://api.cdp.coinbase.com/platform/v2/x402
+  buyer_price_ceiling: max_price.amount_minor 25-1000000 USD cents supplied by the buyer in the request
+  included:
+  - one isolated static validation of one public GitHub Agent Skill commit
+  - one Ed25519-signed DSSE receipt, publicly cacheable and shareable
+  - live receipt status and issuer key, free thereafter
+  limits:
+  - request body 16,384 bytes
+  - expected delivery 10 minutes
+  - delivery capability expires after 30 days
+  refunds: automatic remedy for objective failures only (see conventions/ reversibility)
+  price_history: PRICING.md records that an earlier $49 Stripe-checkout hypothesis was rejected; predeclared future cohort tests at $0.10 and $0.50 are gated on adoption evidence and are NOT current prices
+- id: vouchspec-free-surface
+  name: VouchSpec free surface
+  type: free
+  price: '0'
+  included:
+  - discovery, health, x402 manifest (anonymous)
+  - A2A message/send discovery skill and MCP get_vouchspec_discovery tool (anonymous)
+  - existing signed receipt retrieval by SHA-256 and live invalidation status (anonymous)
+  - issuer public key
+  - Base Sepolia sandbox at 1.00 test USDC per validation (test funds, not revenue)
+product_plans_not_api:
+  note: Plyrium SaaS tiers from https://www.plyrium.com/pricing (monthly, USD, 14-day free trial, no setup fee). These buy the contractor operating system, not API calls; recorded so the Pricing pointer is not misread as API pricing.
+  tiers:
+  - {name: Solo, price: 49, period: month, notes: '1 team member, up to 25 leads/month'}
+  - {name: Voice, price: 149, period: month, notes: 'AI receptionist 24/7, 100 calls/month, up to 5 team members'}
+  - {name: Visibility, price: 249, period: month, notes: 'Google Business Profile management, 4 posts + 1 blog post/month'}
+  - {name: Bundle, price: 699, period: month, notes: '200 calls/month, 3 locations, 15 team members, 200 qualified leads/month'}
+  - {name: Front Office, price: 1199, period: month, notes: 'unlimited calls/locations/team/leads, 1-hour support SLA'}
+  annual: 'A "Save $696/yr" annual toggle is shown; annual prices are not itemised on the page'

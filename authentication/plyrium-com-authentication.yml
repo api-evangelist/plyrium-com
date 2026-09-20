@@ -1,0 +1,73 @@
+generated: '2026-09-19'
+method: searched
+source: https://vouchspec.plyrium.com/api/vouchspec/v1/discovery
+docs: https://vouchspec.plyrium.com/api/vouchspec/v1/discovery
+sources:
+- https://vouchspec.plyrium.com/api/vouchspec/v1/discovery (authentication + acquisition + payment blocks)
+- https://vouchspec.plyrium.com/openapi.json (no securitySchemes declared; PAYMENT-SIGNATURE header parameter; PaidValidationAccess.credentials schema)
+- https://vouchspec.plyrium.com/.well-known/x402 (payTo, facilitator, network)
+- https://www.plyrium.com/vouchspec/policies ("Credential handling")
+- https://raw.githubusercontent.com/mordiaky/vouchspec/main/docs/payment-flow.md (order/result credential pairing, 30-day delivery capability expiry)
+description: >-
+  VouchSpec has no login, API-key signup or OAuth. The read surface is anonymous. The single write operation is
+  gated by PAYMENT, not identity: an x402 v2 challenge-and-retry on POST /api/vouchspec/v1/validate. Credentials
+  exist only AFTER settlement - the 200 response hands back a one-time tenant API key and a one-time delivery
+  token, which together unlock that order's result. The OpenAPI declares no securitySchemes because none of its
+  eight operations takes a credential up front; derive-authentication.py therefore produced no profile and this
+  file is authored from the provider's discovery contract instead.
+anonymous_surface:
+  operations: [getVouchSpecHealth, getVouchSpecDiscovery, getVouchSpecX402Manifest, getVouchSpecValidationService, getVouchSpecIssuerKey, getVouchSpecReceipt, getVouchSpecReceiptStatus]
+  observed: every one answered 200 with no credential on 2026-09-19; response header x-plyrium-auth-bypass anonymous-public
+  mcp: https://vouchspec.plyrium.com/api/vouchspec/v1/mcp - tools/list and tools/call anonymous
+  a2a: https://vouchspec.plyrium.com/api/vouchspec/v1/a2a - message/send anonymous
+schemes:
+- name: x402-payment
+  type: payment-gated
+  applies_to: [purchaseExactCommitValidation]
+  protocol: x402
+  version: 2
+  scheme: exact
+  network: eip155:8453 (Base mainnet)
+  asset: USDC (0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913)
+  amount: '0.25'
+  atomic_amount: '250000'
+  pay_to: '0x5AbA743d6e6Dc22584D9e175D0b39E972AB9918d'
+  facilitator: https://api.cdp.coinbase.com/platform/v2/x402
+  max_timeout_seconds: 300
+  challenge:
+    status: 402
+    header: PAYMENT-REQUIRED (base64 x402 v2 payment requirements)
+    body: JSON with error.code payment_required, accepts[], and an extensions.bazaar block carrying a full example request body
+    observed: 2026-09-19 - an empty unpaid POST returned exactly this (documented as the sanctioned challenge-discovery probe)
+  retry:
+    header: PAYMENT-SIGNATURE (base64 x402 v2 authorization, maxLength 16384, supplied only on the paid retry)
+    response_header: PAYMENT-RESPONSE (base64 settlement response on 200)
+  registration_required: false
+  authentication_before_payment: false
+  human_checkout: false
+  note: Exact payment retries return the same credentials (discovery acquisition.exact_payment_retries_return_same_credentials true)
+- name: tenant-bearer
+  type: http
+  scheme: bearer
+  header: 'Authorization: Bearer {tenant_api_key}'
+  issued_by: purchaseExactCommitValidation 200 response (PaidValidationAccess.credentials.tenant_api_key)
+  shown_once: true
+  stored_as: keyed digest (never plaintext) - policies page "Credential handling"
+  applies_to: order and result endpoints returned in PaidValidationAccess.endpoints (order_template, result_template, rotate/revoke delivery-token templates - not in the public OpenAPI)
+- name: delivery-token
+  type: apiKey
+  in: header
+  header: X-VouchSpec-Delivery-Token
+  issued_by: purchaseExactCommitValidation 200 response (PaidValidationAccess.credentials.delivery_token + delivery_token_expires_at)
+  shown_once: true
+  expires: yes - delivery_token_expires_at in the response; payment-flow.md states delivery capabilities expire after 30 days and may be rotated or revoked
+  applies_to: the same order/result endpoints, REQUIRED TOGETHER with the tenant bearer ("A result requires both credentials")
+idempotency_header: 'Idempotency-Key: {unique_8_to_128_character_value}' # documented for authenticated tenant operations; see conventions/
+result_authentication:
+  media_type: application/vnd.dsse.envelope.v1+json
+  signature: Ed25519 over exact DSSE payload bytes
+  issuer_key: https://vouchspec.plyrium.com/api/vouchspec/v1/keys/issuer (key_id m3Vz2bX1-lZ-osJb91mHCNE_-Lehx2fFc2TvExDbbn0, RFC 8037 OKP JWK)
+  note: The receipt itself is the authenticated object; public receipt bytes need no credential, and the no-store /status endpoint carries live invalidation.
+gaps:
+- The OpenAPI declares no securitySchemes at all, so a generic client cannot learn from the spec alone that POST /validate is x402-gated; the x-x402 and x-vouchspec extensions and the 402 response carry that information instead.
+- The credentialed order/result/rotate/revoke endpoints are named in discovery (route templates) but are absent from the OpenAPI.

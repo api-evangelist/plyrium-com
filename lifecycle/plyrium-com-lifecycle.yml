@@ -1,0 +1,63 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  https://vouchspec.plyrium.com/api/vouchspec/v1/discovery, https://vouchspec.plyrium.com/api/vouchspec/v1/health,
+  https://github.com/mordiaky/vouchspec (CHANGELOG.md, releases v0.2.0/v0.3.0, README product stages),
+  https://www.plyrium.com/vouchspec/policies, https://www.plyrium.com/terms, https://www.plyrium.com/status (probed)
+versioning:
+  scheme: uri-path
+  current: v1
+  path_prefix: /api/vouchspec/v1/
+  document_versions:
+    openapi_info_version: 0.1.0
+    discovery_schema_version: 1.3.0
+    request_schema_version: 1.0.0 (const in ValidationRequest)
+    service_version: 0.6.0 (health.version)
+    mcp_server_version: 0.2.0 (initialize serverInfo); registry entry 0.3.0
+    agent_card_version: 0.1.0
+    terms_version: vouchspec-stage-b-mainnet-2026-07-15
+  docs: https://vouchspec.plyrium.com/api/vouchspec/v1/discovery
+  note: Version identifiers are pinned as JSON Schema const values, so a schema change is a hard break by construction; no version header exists.
+product_stages:
+  source: https://github.com/mordiaky/vouchspec#product-stages
+  stage_a: public artifact index - live (25 signed receipts, read-only REST/MCP retrieval)
+  stage_b: public repository validation - live mainnet (0.25 USDC) plus public Base Sepolia sandbox (1.00 test USDC)
+  stage_c: private/arbitrary inputs - deferred
+  current: B_PUBLIC_X402_MAINNET (discovery.stage), environment live
+deprecation:
+  policy_url: null
+  sunset_header: false
+  deprecation_header: false
+  note: No deprecation policy is published. The CHANGELOG records that the earlier $49/Stripe checkout contract was "superseded" by the 0.25-USDC x402 launch, but no notice period or policy accompanies changes.
+deprecated_operations: []
+receipt_lifecycle:
+  note: The API's durable artefacts (receipts) have their OWN documented lifecycle, separate from API versioning.
+  states: [CURRENT, SUPERSEDED, EXPIRED, REVOKED_EVALUATOR_DEFECT, REVOKED_KEY_COMPROMISE, SIGNATURE_VALID_LIFECYCLE_UNKNOWN]
+  mechanism: receipt bytes are immutable (Cache-Control public, max-age=31536000, immutable); invalidation is published only through the no-store /receipts/{sha256_hex}/status resource and a root-signed lifecycle feed (catalog/public/lifecycle.dsse.json)
+  docs: https://github.com/mordiaky/vouchspec#verify-a-public-receipt-independently
+sla:
+  url: null
+  uptime_target: null
+  expected_delivery: expected_delivery_minutes 10 (discovery.fulfillment) - a delivery expectation, not an SLA
+  note: Plyrium's SaaS Terms (section 8) say "We strive for high availability but do not guarantee uninterrupted service"; the Front Office tier advertises a 1-hour support-response SLA for the SaaS product, not for the API.
+status_page: null
+status_page_probe:
+  url: https://www.plyrium.com/status
+  status: 307
+  note: redirects to /login - no public status page. Runtime health is GET /api/vouchspec/v1/health (no-store, returned status ok, live_settlement true on 2026-09-19).
+health_endpoint: https://vouchspec.plyrium.com/api/vouchspec/v1/health
+changelog: changelog/plyrium-com-changelog.yml
+releases:
+- tag: v0.2.0
+  date: '2026-07-14'
+  note: Stage A alpha candidate (CHANGELOG dates it 2026-07-13; GitHub release published 2026-07-14T06:00:21Z)
+- tag: v0.3.0
+  date: '2026-07-15'
+  note: MCP Registry v0.3.0 entry published the same day, moving the remote from the sandbox to the live host
+repository_activity:
+  created: '2026-07-14'
+  last_push: '2026-07-16'
+  note: 3 days of public history; nothing pushed since 2026-07-16 while the live service kept answering on 2026-09-19.
+pointers_emitted:
+  StatusPage: false
+  Deprecation: false

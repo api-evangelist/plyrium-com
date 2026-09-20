@@ -1,0 +1,54 @@
+generated: '2026-09-19'
+method: derived
+source: >-
+  Derived by aligning the live MCP tools/list (probed anonymously 2026-09-19 at
+  https://vouchspec.plyrium.com/api/vouchspec/v1/mcp, one tool with inputSchema) and the A2A skill list
+  (a2a/plyrium-com-agent-card.json) with the provider-hosted OpenAPI 3.1 (openapi/plyrium-com-vouchspec-openapi.yml,
+  8 operations). Nothing here is inferred - the MCP tool's own observed output is byte-equivalent to the REST
+  discovery response.
+purpose: >-
+  VouchSpec deliberately splits its surface: MCP and A2A carry ONLY the free read-only discovery capability,
+  and the paid purchase plus receipt verification live ONLY on REST (x402-gated POST + anonymous GETs). The
+  crosswalk makes that split explicit so an agent knows which surface can actually complete the job.
+surfaces:
+  rest_openapi: openapi/plyrium-com-vouchspec-openapi.yml     # 8 operations, 4 schemas; anonymous except POST /validate (x402)
+  mcp: https://vouchspec.plyrium.com/api/vouchspec/v1/mcp     # tools/list open (no auth); 1 tool
+  a2a: https://vouchspec.plyrium.com/api/vouchspec/v1/a2a     # message/send open (no auth); 1 skill
+  graphql: null
+crosswalk:
+- tool: get_vouchspec_discovery
+  surface: mcp
+  category: discovery
+  rest: [getVouchSpecDiscovery]
+  binding: rest
+  confidence: high
+  note: Observed structuredContent is the same schema_version 1.3.0 document GET /api/vouchspec/v1/discovery returns; inputSchema is an empty object on both sides.
+- tool: discover_vouchspec_validation
+  surface: a2a
+  category: discovery
+  rest: [getVouchSpecDiscovery]
+  binding: rest
+  confidence: high
+  note: A2A skill; message/send returned the discovery document as a data part. Same backing operation as the MCP tool.
+mcp_only: []
+rest_only:
+- category: discovery
+  operations: [getVouchSpecHealth, getVouchSpecX402Manifest, getVouchSpecValidationService]
+  reason: Health, x402 manifest and the GET side of /validate are REST-only; their content is folded into the discovery document the tool returns.
+- category: purchase
+  operations: [purchaseExactCommitValidation]
+  reason: >-
+    The only write operation. x402-paid (402 PAYMENT-REQUIRED challenge, retry with PAYMENT-SIGNATURE). Discovery
+    states mcp.paid_execution_available false and a2a.paid_execution_available false - purchase is REST-only by design.
+- category: verification
+  operations: [getVouchSpecIssuerKey, getVouchSpecReceipt, getVouchSpecReceiptStatus]
+  reason: Receipt bytes, live status and the Ed25519 issuer key are anonymous REST GETs with no MCP or A2A equivalent.
+coverage:
+  mcp_tools_named: 1
+  mcp_tools_bound: 1
+  a2a_skills_named: 1
+  a2a_skills_bound: 1
+  mcp_only: 0
+  rest_operations_total: 8
+  rest_operations_with_tool: 1
+  rest_operations_without_tool: 7

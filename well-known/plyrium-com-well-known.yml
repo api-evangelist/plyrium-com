@@ -1,0 +1,230 @@
+generated: '2026-09-19'
+method: probed
+description: >-
+  Results of probing the /.well-known/ discovery surface on every host this record knows: the registrable
+  domain and www, the VouchSpec API host (apis[].baseURL and the OpenAPI servers[] host, which is also the
+  MCP server host and the A2A host), the demo/console host, and the published test sandbox host. Status is
+  the HTTP code observed at fetch time on 2026-09-19. Only documents that returned a real, correctly-typed
+  payload were saved verbatim. Three hosts have catch-all behaviour that is NOT a document and is recorded
+  as a miss - vouchspec.plyrium.com 308s every unknown path to /api/vouchspec/v1/discovery (a JSON contract,
+  not the requested well-known document); www.plyrium.com and demo.plyrium.com 307 every unknown path to
+  /login; vouchspec-sandbox.plyrium.com answers 401 with an HTML shell for everything except its discovery
+  and health routes. No security.txt, OIDC, OAuth authorization-server or protected-resource metadata is
+  served on any host - the API is anonymous-read plus x402-paid, so there is no OAuth surface to describe.
+  A parsing AI Catalog (ARD), an x402 manifest, an Agent Skill index and an OpenAPI alias ARE served on the
+  VouchSpec host, alongside the A2A agent card recorded in a2a/.
+hosts:
+- host: https://vouchspec.plyrium.com
+  role: API host, OpenAPI servers[] host, MCP host, A2A host
+  documents:
+  - path: /.well-known/security.txt
+    status: 308
+    note: redirects to /api/vouchspec/v1/discovery - not a security.txt
+  - path: /.well-known/openid-configuration
+    status: 308
+    note: redirects to /api/vouchspec/v1/discovery
+  - path: /.well-known/oauth-authorization-server
+    status: 308
+    note: redirects to /api/vouchspec/v1/discovery
+  - path: /.well-known/oauth-protected-resource
+    status: 308
+    note: redirects to /api/vouchspec/v1/discovery
+  - path: /.well-known/api-catalog
+    status: 308
+    note: redirects to /api/vouchspec/v1/discovery
+  - path: /.well-known/api-catalog.json
+    status: 308
+  - path: /.well-known/ai-plugin.json
+    status: 308
+  - path: /.well-known/ucp.json
+    status: 308
+  - path: /.well-known/acp.json
+    status: 308
+  - path: /.well-known/aauth-resource.json
+    status: 308
+  - path: /.well-known/apis.json
+    status: 308
+  - path: /apis.json
+    status: 308
+  - path: /apis.yml
+    status: 308
+  - path: /.well-known/mcp.json
+    status: 308
+  - path: /.well-known/agent-card.json
+    status: 200
+    type: application/json; charset=utf-8
+    file: ../a2a/plyrium-com-agent-card.json
+    note: A2A agent card, protocolVersion 0.3.0 - graded in a2a/plyrium-com-a2a.yml
+  - path: /.well-known/agent.json
+    status: 200
+    type: application/json; charset=utf-8
+    note: legacy path; byte-identical to agent-card.json
+  - path: /.well-known/ai-catalog.json
+    status: 200
+    type: application/json; charset=utf-8
+    file: plyrium-com-ai-catalog.json
+    note: >-
+      AI Catalog / Agentic Resource Discovery document, specVersion 1.0, host.displayName "Plyrium", two
+      entries - the A2A card (application/a2a-agent-card+json) and the OpenAPI (application/openapi+json),
+      each with a domain-anchored urn:air:vouchspec.plyrium.com URN. Discovery marks ARD as draft_proposal.
+  - path: /.well-known/x402
+    status: 200
+    type: application/json; charset=utf-8
+    file: plyrium-com-x402.json
+    note: x402Version 2 manifest - one paid endpoint (POST /api/vouchspec/v1/validate), exact scheme, eip155:8453, 250000 atomic USDC, Coinbase CDP facilitator
+  - path: /.well-known/skills/index.json
+    status: 200
+    type: application/json; charset=utf-8
+    file: plyrium-com-skills-index.json
+    note: Agent Skill index; one skill, saved verbatim under skills/
+  - path: /.well-known/skills/vouchspec-verify-before-install/SKILL.md
+    status: 200
+    type: text/markdown; charset=utf-8
+    file: ../skills/plyrium-com-vouchspec-verify-before-install.md
+  - path: /.well-known/openapi.json
+    status: 200
+    type: application/json; charset=utf-8
+    file: plyrium-com-openapi.json
+    note: byte-identical to /openapi.json (the primary), which is saved under openapi/
+- host: https://plyrium.com
+  role: registrable domain
+  documents:
+  - path: /.well-known/security.txt
+    status: 308
+    note: every path 308s to https://www.plyrium.com/<same path>
+  - path: /.well-known/openid-configuration
+    status: 308
+  - path: /.well-known/oauth-authorization-server
+    status: 308
+  - path: /.well-known/oauth-protected-resource
+    status: 308
+  - path: /.well-known/api-catalog
+    status: 308
+  - path: /.well-known/ai-plugin.json
+    status: 308
+  - path: /.well-known/ucp.json
+    status: 308
+  - path: /.well-known/acp.json
+    status: 308
+  - path: /.well-known/aauth-resource.json
+    status: 308
+  - path: /.well-known/apis.json
+    status: 308
+  - path: /apis.json
+    status: 308
+  - path: /apis.yml
+    status: 308
+  - path: /.well-known/agent-card.json
+    status: 308
+  - path: /.well-known/agent.json
+    status: 308
+- host: https://www.plyrium.com
+  role: website and docs host
+  documents:
+  - path: /.well-known/security.txt
+    status: 307
+    note: redirects to /login?redirect=... - the Next.js app gates every unknown path behind login; not a document
+  - path: /.well-known/openid-configuration
+    status: 307
+  - path: /.well-known/oauth-authorization-server
+    status: 307
+  - path: /.well-known/oauth-protected-resource
+    status: 307
+  - path: /.well-known/api-catalog
+    status: 307
+  - path: /.well-known/api-catalog.json
+    status: 307
+  - path: /.well-known/ai-plugin.json
+    status: 307
+  - path: /.well-known/ucp.json
+    status: 307
+  - path: /.well-known/acp.json
+    status: 307
+  - path: /.well-known/aauth-resource.json
+    status: 307
+  - path: /.well-known/apis.json
+    status: 307
+  - path: /apis.json
+    status: 307
+  - path: /apis.yml
+    status: 307
+  - path: /.well-known/agent-card.json
+    status: 307
+  - path: /.well-known/agent.json
+    status: 307
+  - path: /.well-known/mcp.json
+    status: 307
+  - path: /llms.txt
+    status: 307
+  - path: /robots.txt
+    status: 200
+    type: text/plain; charset=utf-8
+    note: 'User-agent: * / Allow: / / Sitemap: https://www.plyrium.com/sitemap.xml'
+- host: https://demo.plyrium.com
+  role: shared demo workspace (Terms 3.4)
+  documents:
+  - path: /.well-known/security.txt
+    status: 307
+    note: same login catch-all as www
+  - path: /.well-known/openid-configuration
+    status: 307
+  - path: /.well-known/oauth-authorization-server
+    status: 307
+  - path: /.well-known/oauth-protected-resource
+    status: 307
+  - path: /.well-known/api-catalog
+    status: 307
+  - path: /.well-known/ai-plugin.json
+    status: 307
+  - path: /.well-known/ucp.json
+    status: 307
+  - path: /.well-known/acp.json
+    status: 307
+  - path: /.well-known/aauth-resource.json
+    status: 307
+  - path: /.well-known/apis.json
+    status: 307
+  - path: /apis.json
+    status: 307
+  - path: /apis.yml
+    status: 307
+  - path: /.well-known/agent-card.json
+    status: 307
+  - path: /.well-known/agent.json
+    status: 307
+- host: https://vouchspec-sandbox.plyrium.com
+  role: published Base Sepolia test sandbox
+  documents:
+  - path: /.well-known/security.txt
+    status: 401
+    note: HTML shell; only /api/vouchspec/v1/discovery and /api/vouchspec/v1/health answer 200 on this host
+  - path: /.well-known/openid-configuration
+    status: 401
+  - path: /.well-known/oauth-authorization-server
+    status: 401
+  - path: /.well-known/oauth-protected-resource
+    status: 401
+  - path: /.well-known/api-catalog
+    status: 401
+  - path: /.well-known/ai-plugin.json
+    status: 401
+  - path: /.well-known/ucp.json
+    status: 401
+  - path: /.well-known/acp.json
+    status: 401
+  - path: /.well-known/aauth-resource.json
+    status: 401
+  - path: /.well-known/apis.json
+    status: 401
+  - path: /apis.json
+    status: 401
+  - path: /apis.yml
+    status: 401
+  - path: /.well-known/agent-card.json
+    status: 401
+  - path: /.well-known/x402
+    status: 401
+unprobed_hosts:
+- host: api.plyrium.com / mcp.plyrium.com / app.plyrium.com / docs.plyrium.com
+  status: 404
+  note: Vercel DEPLOYMENT_NOT_FOUND on every path - these hostnames resolve but no deployment is bound to them

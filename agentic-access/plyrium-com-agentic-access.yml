@@ -1,0 +1,102 @@
+generated: '2026-09-19'
+method: generated
+source: openapi/plyrium-com-vouchspec-openapi.yml
+description: Recommended x-agentic-access execution contracts, classified heuristically from
+  the OpenAPI. A governance starting point for exposing this API to AI agents — review and bind
+  audience per deployment. See research/curity/agentic-governance/.
+summary:
+  operations: 8
+  by_action_class:
+    connected: 7
+    acting: 1
+  by_consequence:
+    read: 7
+    safety-critical: 1
+  human_in_the_loop_required: 1
+operations:
+- path: /api/vouchspec/v1/health
+  method: get
+  operationId: getVouchSpecHealth
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /api/vouchspec/v1/discovery
+  method: get
+  operationId: getVouchSpecDiscovery
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /.well-known/x402
+  method: get
+  operationId: getVouchSpecX402Manifest
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /api/vouchspec/v1/validate
+  method: get
+  operationId: getVouchSpecValidationService
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /api/vouchspec/v1/validate
+  method: post
+  operationId: purchaseExactCommitValidation
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /api/vouchspec/v1/keys/issuer
+  method: get
+  operationId: getVouchSpecIssuerKey
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /api/vouchspec/v1/receipts/{sha256_hex}
+  method: get
+  operationId: getVouchSpecReceipt
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /api/vouchspec/v1/receipts/{sha256_hex}/status
+  method: get
+  operationId: getVouchSpecReceiptStatus
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none

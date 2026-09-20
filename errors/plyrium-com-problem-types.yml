@@ -1,0 +1,72 @@
+generated: '2026-09-19'
+method: derived
+source: openapi/plyrium-com-vouchspec-openapi.yml (components.responses + per-operation responses) enriched with the live envelopes observed on 2026-09-19 and the SKILL.md decision vocabulary
+format: custom
+envelope:
+  media_type: application/json
+  shape: '{"error": {"code": string, "message": string}}'
+  schema: openapi components.schemas.Error (additionalProperties false; both fields required)
+  rfc9457: false
+  note: >-
+    The 402 response extends the envelope with x402 fields (protocol, x402Version, resource, accepts[], extensions.bazaar)
+    and carries the machine-readable requirements in the PAYMENT-REQUIRED header. Error codes are snake_case strings.
+problems:
+- status: 400
+  code: null
+  title: Malformed or invalid request
+  description: components.responses.BadRequest - schema violation of ValidationRequest (strict, additionalProperties false, duplicate JSON keys rejected).
+  source_operation: openapi/plyrium-com-vouchspec-openapi.yml#purchaseExactCommitValidation
+  remediation: Re-read the ValidationRequest schema from /openapi.json or the discovery document; every const must match exactly (schema_version 1.0.0, operation fresh_public_static_validation, profile vouchspec-public-static-v1, host github.com, currency usd); commit must be a full lowercase 40-hex SHA.
+- status: 402
+  code: payment_required
+  title: Payment is required
+  description: The canonical x402 v2 challenge. Header PAYMENT-REQUIRED (required, base64) carries the payment requirements; the body repeats them with accepts[] and a bazaar example request.
+  observed: '2026-09-19: {"error":{"code":"payment_required","message":"A valid x402 payment signature is required"}, "protocol":"x402", "x402Version":2, ...}'
+  source_operation: openapi/plyrium-com-vouchspec-openapi.yml#purchaseExactCommitValidation
+  remediation: This is the expected first response, not a failure. Authorise exactly that challenge (scheme exact, eip155:8453, 250000 atomic USDC to payTo, within maxTimeoutSeconds 300) and retry the IDENTICAL body with PAYMENT-SIGNATURE. Stop with decision payment_required if the agent has no wallet or spending authority (SKILL.md step 5).
+- status: 403
+  code: null
+  title: Forbidden
+  description: components.responses.Forbidden - request refused; the contract does not enumerate causes.
+  source_operation: openapi/plyrium-com-vouchspec-openapi.yml#purchaseExactCommitValidation
+  remediation: Not documented; check the terms version and payment fields against the live discovery document before retrying.
+- status: 404
+  code: not_found
+  title: Resource not found
+  description: components.responses.NotFound - no receipt with that SHA-256 digest.
+  observed: '2026-09-19: GET /api/vouchspec/v1/receipts/000...0 -> {"error":{"code":"not_found","message":"resource not found"}}, Cache-Control no-store; same envelope on /status'
+  source_operation: openapi/plyrium-com-vouchspec-openapi.yml#getVouchSpecReceipt
+  also: [getVouchSpecReceiptStatus]
+  remediation: 'The digest must be the lowercase SHA-256 of the EXACT DSSE envelope bytes without the sha256: prefix. A 404 on /status for a receipt you hold means treat the evidence as unknown/denied (SKILL.md step 7).'
+- status: 413
+  code: null
+  title: Request body too large
+  description: components.responses.TooLarge - body exceeds request.maximum_bytes 16384.
+  source_operation: openapi/plyrium-com-vouchspec-openapi.yml#purchaseExactCommitValidation
+  remediation: The valid request is a few hundred bytes; trim any extra fields (they would fail additionalProperties anyway).
+- status: 422
+  code: invalid_commerce_request
+  title: Fresh validation request is invalid
+  description: NOT DECLARED IN THE OPENAPI. Observed live for a syntactically valid JSON body that fails the strict schema.
+  observed: '2026-09-19: POST {"schema_version":"9"} -> 422 {"error":{"code":"invalid_commerce_request","message":"fresh validation request is invalid"}}'
+  source_operation: openapi/plyrium-com-vouchspec-openapi.yml#purchaseExactCommitValidation
+  remediation: Same as 400. Spec gap - the contract lists 400 for this case but the service answers 422.
+- status: 429
+  code: null
+  title: Rate limited
+  description: components.responses.RateLimited. No RateLimit-* or Retry-After header is documented for this response.
+  source_operation: openapi/plyrium-com-vouchspec-openapi.yml#purchaseExactCommitValidation
+  remediation: Back off; the provider's skill says to honour Retry-After on order polling and to avoid rapid polling, but no numeric limit is published (rate-limits/plyrium-com-rate-limits.yml).
+- status: 503
+  code: null
+  title: Service unavailable
+  description: components.responses.Unavailable - declared on every operation, including the anonymous reads; health returns status ok when commerce is operational.
+  source_operation: openapi/plyrium-com-vouchspec-openapi.yml#getVouchSpecHealth
+  also: [getVouchSpecDiscovery, getVouchSpecX402Manifest, getVouchSpecValidationService, purchaseExactCommitValidation, getVouchSpecIssuerKey, getVouchSpecReceipt, getVouchSpecReceiptStatus]
+  remediation: Check GET /api/vouchspec/v1/health (no-store) before purchasing; do not pay while it reports anything other than status ok / live_settlement true.
+agent_decisions:
+  note: The provider's SKILL.md defines the decision vocabulary an agent should emit after using this API - allow, deny, unknown, payment_required - and the receipt lifecycle states that drive it (CURRENT, SUPERSEDED, EXPIRED, REVOKED_EVALUATOR_DEFECT, REVOKED_KEY_COMPROMISE, SIGNATURE_VALID_LIFECYCLE_UNKNOWN).
+gaps:
+- 422 is served but not declared; 400 is declared for the same case.
+- 403 and 429 have no documented cause, code or headers.
+- The A2A endpoint returns JSON-RPC errors (observed -32601 "Method not allowed" on GET), a different envelope from REST.
