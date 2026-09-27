@@ -1,0 +1,31 @@
+{
+  "provider": "plyrium-com",
+  "sources": [
+    "_original/plyrium-com-vouchspec-openapi.json",
+    "plyrium-com-vouchspec-openapi.yml",
+    "well-known/plyrium-com-openapi.json"
+  ],
+  "outputs": [
+    "plyrium-com-discovery-api-openapi.yml",
+    "plyrium-com-purchase-api-openapi.yml",
+    "plyrium-com-verification-api-openapi.yml"
+  ],
+  "archived": [
+    "archived openapi/plyrium-com-vouchspec-openapi.yml",
+    "archived well-known/plyrium-com-openapi.json"
+  ],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "discovered stray spec: well-known/plyrium-com-openapi.json",
+    "plyrium-com-vouchspec-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "plyrium-com-vouchspec-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "plyrium-com-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "tag 'Discovery' spans 3 source specs (plyrium-com-vouchspec-openapi.json, plyrium-com-vouchspec-openapi.yml, plyrium-com-openapi.json): per-path servers applied",
+    "tag 'Purchase' spans 3 source specs (plyrium-com-vouchspec-openapi.json, plyrium-com-vouchspec-openapi.yml, plyrium-com-openapi.json): per-path servers applied",
+    "tag 'Verification' spans 3 source specs (plyrium-com-vouchspec-openapi.json, plyrium-com-vouchspec-openapi.yml, plyrium-com-openapi.json): per-path servers applied",
+    "apis.yml register: written (+3 apis, 3 total)"
+  ],
+  "skipped": []
+}

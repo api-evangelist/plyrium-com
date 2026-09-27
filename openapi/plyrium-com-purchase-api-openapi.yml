@@ -1,0 +1,272 @@
+openapi: 3.2.0
+info:
+  title: Plyrium Com Purchase API
+  version: 0.1.0
+  termsOfService: https://www.plyrium.com/vouchspec/policies
+  description: 'Operations tagged Purchase across 3 of this provider''s published API definitions: plyrium-com-vouchspec-openapi.json, plyrium-com-vouchspec-openapi.yml, plyrium-com-openapi.json. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://vouchspec.plyrium.com
+  description: Base mainnet commerce
+tags:
+- name: Purchase
+  description: x402-paid exact-commit validation intake.
+paths:
+  /api/vouchspec/v1/validate:
+    post:
+      tags:
+      - Purchase
+      operationId: purchaseExactCommitValidation
+      summary: Purchase validation for one exact public Agent Skill commit
+      description: Send the strict validation request without PAYMENT-SIGNATURE to receive the canonical 402 challenge. Authorize exactly that challenge, then retry the identical request with PAYMENT-SIGNATURE. An exactly empty unpaid probe is also accepted for challenge discovery; a paid request always requires the body.
+      parameters:
+      - $ref: '#/components/parameters/PaymentSignature'
+      requestBody:
+        required: false
+        description: Required for every purchase and payment retry; optional only for an empty unpaid challenge probe.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationRequest'
+      responses:
+        '200':
+          description: Payment settled. One-time bearer credentials and delivery endpoints are returned.
+          headers:
+            PAYMENT-RESPONSE:
+              description: Base64-encoded x402 settlement response.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaidValidationAccess'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '402':
+          description: Payment is required. Authorize the exact challenge and retry the identical request.
+          headers:
+            PAYMENT-REQUIRED:
+              description: Base64-encoded x402 v2 payment requirements.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '413':
+          $ref: '#/components/responses/TooLarge'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+      x-x402:
+        version: 2
+        scheme: exact
+        network: eip155:8453
+        asset: USDC
+        amountAtomic: '250000'
+        manifest: https://vouchspec.plyrium.com/.well-known/x402
+      x-vouchspec-side-effects: Payment settlement and asynchronous isolated validation after a valid paid retry.
+    servers:
+    - url: https://vouchspec.plyrium.com
+      description: Base mainnet commerce
+components:
+  schemas:
+    Error:
+      type: object
+      additionalProperties: false
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+    PaidValidationAccess:
+      type: object
+      additionalProperties: false
+      required:
+      - schema_version
+      - order
+      - credentials
+      - endpoints
+      - payment
+      properties:
+        schema_version:
+          const: 1.0.0
+        order:
+          type: object
+          additionalProperties: true
+        credentials:
+          type: object
+          additionalProperties: false
+          required:
+          - tenant_api_key
+          - delivery_token
+          - delivery_token_expires_at
+          - notice
+          properties:
+            tenant_api_key:
+              type: string
+              description: Secret bearer capability shown once.
+            delivery_token:
+              type: string
+              description: Secret delivery capability shown once.
+            delivery_token_expires_at:
+              type: string
+              format: date-time
+            notice:
+              type: string
+        endpoints:
+          type: object
+          additionalProperties: true
+        payment:
+          type: object
+          additionalProperties: true
+    ValidationRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - schema_version
+      - operation
+      - source
+      - profile
+      - max_price
+      - delivery_id
+      properties:
+        schema_version:
+          const: 1.0.0
+        operation:
+          const: fresh_public_static_validation
+        source:
+          type: object
+          additionalProperties: false
+          required:
+          - host
+          - owner
+          - repository
+          - commit
+          - skill_path
+          properties:
+            host:
+              const: github.com
+            owner:
+              type: string
+              pattern: ^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$
+            repository:
+              type: string
+              pattern: ^[A-Za-z0-9](?:[A-Za-z0-9_.-]{0,99})$
+            commit:
+              type: string
+              pattern: ^[0-9a-f]{40}$
+            skill_path:
+              type: string
+              minLength: 1
+              maxLength: 1024
+        profile:
+          const: vouchspec-public-static-v1
+        max_price:
+          type: object
+          additionalProperties: false
+          required:
+          - currency
+          - amount_minor
+          properties:
+            currency:
+              const: usd
+            amount_minor:
+              type: integer
+              minimum: 25
+              maximum: 1000000
+        delivery_id:
+          type: string
+          pattern: ^[A-Za-z0-9_-]{8,64}$
+  responses:
+    RateLimited:
+      description: Request rate exceeded.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    TooLarge:
+      description: Request body exceeds the bounded intake limit.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Malformed or invalid request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unavailable:
+      description: VouchSpec is temporarily unavailable.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Cross-site mutation rejected.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  parameters:
+    PaymentSignature:
+      name: PAYMENT-SIGNATURE
+      in: header
+      required: false
+      description: Base64-encoded x402 v2 authorization supplied only on the paid retry.
+      schema:
+        type: string
+        maxLength: 16384
+externalDocs:
+  description: VouchSpec machine discovery contract
+  url: https://vouchspec.plyrium.com/api/vouchspec/v1/discovery
+x-refined-from:
+- plyrium-com-vouchspec-openapi.json
+- plyrium-com-vouchspec-openapi.yml
+- plyrium-com-openapi.json
+x-vouchspec:
+  agentOnly: true
+  humanCheckout: false
+  profile: vouchspec-public-static-v1
+  operation: fresh_public_static_validation
+  payment:
+    protocol: x402
+    version: 2
+    scheme: exact
+    network: eip155:8453
+    asset: USDC
+    amount: '0.25'
+    atomicAmount: '250000'
+  ardCatalog: https://vouchspec.plyrium.com/.well-known/ai-catalog.json
+  fulfillment:
+    accepted_input: immutable_public_github_coordinates
+    artifact_uploads: false
+    private_repositories: false
+    artifact_code_executed: false
+    inspection_worker_egress: false
+    signer_egress: false
+    expected_delivery_minutes: 10

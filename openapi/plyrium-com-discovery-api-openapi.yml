@@ -1,0 +1,151 @@
+openapi: 3.2.0
+info:
+  title: Plyrium Com Discovery API
+  version: 0.1.0
+  termsOfService: https://www.plyrium.com/vouchspec/policies
+  description: 'Operations tagged Discovery across 3 of this provider''s published API definitions: plyrium-com-vouchspec-openapi.json, plyrium-com-vouchspec-openapi.yml, plyrium-com-openapi.json. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://vouchspec.plyrium.com
+  description: Base mainnet commerce
+tags:
+- name: Discovery
+  description: Free, anonymous machine-readable service metadata.
+paths:
+  /api/vouchspec/v1/health:
+    get:
+      tags:
+      - Discovery
+      operationId: getVouchSpecHealth
+      summary: Check whether commerce is operational
+      responses:
+        '200':
+          description: VouchSpec is operational.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '503':
+          $ref: '#/components/responses/Unavailable'
+    servers:
+    - url: https://vouchspec.plyrium.com
+      description: Base mainnet commerce
+  /api/vouchspec/v1/discovery:
+    get:
+      tags:
+      - Discovery
+      operationId: getVouchSpecDiscovery
+      summary: Get the canonical VouchSpec machine contract
+      responses:
+        '200':
+          description: Current endpoints, schemas, payment terms, and receipt rules.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '503':
+          $ref: '#/components/responses/Unavailable'
+    servers:
+    - url: https://vouchspec.plyrium.com
+      description: Base mainnet commerce
+  /.well-known/x402:
+    get:
+      tags:
+      - Discovery
+      operationId: getVouchSpecX402Manifest
+      summary: Get the x402 payment manifest
+      responses:
+        '200':
+          description: Current x402 endpoint and payment requirement metadata.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '503':
+          $ref: '#/components/responses/Unavailable'
+    servers:
+    - url: https://vouchspec.plyrium.com
+      description: Base mainnet commerce
+  /api/vouchspec/v1/validate:
+    get:
+      tags:
+      - Discovery
+      operationId: getVouchSpecValidationService
+      summary: Check the validation service and discover its paid POST operation
+      description: Read-only health and payment-discovery metadata. This operation never verifies or settles a payment.
+      responses:
+        '200':
+          description: The agent-only validation service is ready.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '503':
+          $ref: '#/components/responses/Unavailable'
+      x-vouchspec-side-effects: None. Payment is accepted only by POST.
+    servers:
+    - url: https://vouchspec.plyrium.com
+      description: Base mainnet commerce
+components:
+  schemas:
+    Error:
+      type: object
+      additionalProperties: false
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+  responses:
+    Unavailable:
+      description: VouchSpec is temporarily unavailable.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+externalDocs:
+  description: VouchSpec machine discovery contract
+  url: https://vouchspec.plyrium.com/api/vouchspec/v1/discovery
+x-refined-from:
+- plyrium-com-vouchspec-openapi.json
+- plyrium-com-vouchspec-openapi.yml
+- plyrium-com-openapi.json
+x-vouchspec:
+  agentOnly: true
+  humanCheckout: false
+  profile: vouchspec-public-static-v1
+  operation: fresh_public_static_validation
+  payment:
+    protocol: x402
+    version: 2
+    scheme: exact
+    network: eip155:8453
+    asset: USDC
+    amount: '0.25'
+    atomicAmount: '250000'
+  ardCatalog: https://vouchspec.plyrium.com/.well-known/ai-catalog.json
+  fulfillment:
+    accepted_input: immutable_public_github_coordinates
+    artifact_uploads: false
+    private_repositories: false
+    artifact_code_executed: false
+    inspection_worker_egress: false
+    signer_egress: false
+    expected_delivery_minutes: 10

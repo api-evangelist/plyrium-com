@@ -9,6 +9,22 @@ description: >-
   discoverable through an OpenAPI 3.1 contract, llms.txt, an A2A agent card, a remote MCP server, an
   installable Agent Skill and an ARD ai-catalog.
 url: https://raw.githubusercontent.com/api-evangelist/plyrium-com/refs/heads/main/apis.yml
+deliveryModel:
+  model: saas
+  license_evidence:
+    not_product:
+    - mordiaky/vouchspec
+  open_source: unknown
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: low
+  source:
+  - openapi
+  - pricing
+  - repository-not-product
+  generated: '2026-09-25'
+  method: derived
 image: https://www.plyrium.com/brand/plyrium-icon-rounded-1024.png
 x-type: company
 x-source: harvest:a2a-registry
@@ -29,51 +45,109 @@ tags:
 - Field Service
 - Home Services
 apis:
-- aid: plyrium-com:vouchspec-agent-skill-evidence-api
-  name: VouchSpec Agent Skill Evidence API
-  description: >-
-    Agent-only API for purchasing fresh, isolated static validation and signed evidence for one exact
-    immutable public GitHub Agent Skill commit. Free anonymous discovery and verification operations
-    (health, discovery, x402 manifest, issuer key, immutable DSSE receipt bytes, live receipt status) plus
-    one x402-paid purchase operation settling 0.25 USDC on Base mainnet (eip155:8453). No human checkout,
-    no uploads, no private repositories; artifact code is never executed.
-  image: https://www.plyrium.com/brand/plyrium-icon-rounded-1024.png
+- aid: plyrium-com:plyrium-com-discovery-api
+  name: Plyrium Discovery API
+  description: Free, anonymous machine-readable service metadata.
   humanURL: https://www.plyrium.com/vouchspec
   baseURL: https://vouchspec.plyrium.com
   tags:
-  - Agent Skills
-  - Supply Chain Security
-  - Software Provenance
-  - x402
-  - Signed Receipts
+  - Discovery
   properties:
   - type: OpenAPI
-    url: openapi/plyrium-com-vouchspec-openapi.yml
-  - type: OpenAPI
-    url: https://vouchspec.plyrium.com/openapi.json
-    name: Provider-hosted OpenAPI 3.1 (alias at /.well-known/openapi.json)
+    url: openapi/plyrium-com-discovery-api-openapi.yml
   - type: Documentation
     url: https://www.plyrium.com/vouchspec
   - type: APIReference
     url: https://vouchspec.plyrium.com/openapi.json
   - type: GettingStarted
-    url: https://vouchspec.plyrium.com/.well-known/skills/vouchspec-verify-before-install/SKILL.md
+    url: >-
+      https://vouchspec.plyrium.com/.well-known/skills/vouchspec-verify-before-install/SKILL.md
   - type: Discovery
     url: https://vouchspec.plyrium.com/api/vouchspec/v1/discovery
   - type: TermsOfService
     url: https://www.plyrium.com/vouchspec/policies
   - type: LLMsTxt
     url: llms/plyrium-com-llms.txt
-  - type: MCPServer
-    url: mcp/plyrium-com-mcp.yml
   - type: ToolCrosswalk
     url: mcp/plyrium-com-tool-crosswalk.yml
   - type: AgentCard
     url: a2a/plyrium-com-a2a.yml
   - type: AICatalog
     url: well-known/plyrium-com-ai-catalog.json
-  - type: Overlay
-    url: overlays/plyrium-com-vouchspec-overlay.yaml
+  - type: ErrorCatalog
+    url: errors/plyrium-com-problem-types.yml
+  - type: DataModel
+    url: data-model/plyrium-com-data-model.yml
+  - type: Sandbox
+    url: sandbox/plyrium-com-sandbox.yml
+  - type: GitHub
+    url: https://github.com/mordiaky/vouchspec
+- aid: plyrium-com:plyrium-com-purchase-api
+  name: Plyrium Purchase API
+  description: x402-paid exact-commit validation intake.
+  humanURL: https://www.plyrium.com/vouchspec
+  baseURL: https://vouchspec.plyrium.com
+  tags:
+  - Purchase
+  properties:
+  - type: OpenAPI
+    url: openapi/plyrium-com-purchase-api-openapi.yml
+  - type: Documentation
+    url: https://www.plyrium.com/vouchspec
+  - type: APIReference
+    url: https://vouchspec.plyrium.com/openapi.json
+  - type: GettingStarted
+    url: >-
+      https://vouchspec.plyrium.com/.well-known/skills/vouchspec-verify-before-install/SKILL.md
+  - type: Discovery
+    url: https://vouchspec.plyrium.com/api/vouchspec/v1/discovery
+  - type: TermsOfService
+    url: https://www.plyrium.com/vouchspec/policies
+  - type: LLMsTxt
+    url: llms/plyrium-com-llms.txt
+  - type: ToolCrosswalk
+    url: mcp/plyrium-com-tool-crosswalk.yml
+  - type: AgentCard
+    url: a2a/plyrium-com-a2a.yml
+  - type: AICatalog
+    url: well-known/plyrium-com-ai-catalog.json
+  - type: ErrorCatalog
+    url: errors/plyrium-com-problem-types.yml
+  - type: DataModel
+    url: data-model/plyrium-com-data-model.yml
+  - type: Sandbox
+    url: sandbox/plyrium-com-sandbox.yml
+  - type: GitHub
+    url: https://github.com/mordiaky/vouchspec
+- aid: plyrium-com:plyrium-com-verification-api
+  name: Plyrium Verification API
+  description: Public receipt bytes, status, and issuer key.
+  humanURL: https://www.plyrium.com/vouchspec
+  baseURL: https://vouchspec.plyrium.com
+  tags:
+  - Verification
+  properties:
+  - type: OpenAPI
+    url: openapi/plyrium-com-verification-api-openapi.yml
+  - type: Documentation
+    url: https://www.plyrium.com/vouchspec
+  - type: APIReference
+    url: https://vouchspec.plyrium.com/openapi.json
+  - type: GettingStarted
+    url: >-
+      https://vouchspec.plyrium.com/.well-known/skills/vouchspec-verify-before-install/SKILL.md
+  - type: Discovery
+    url: https://vouchspec.plyrium.com/api/vouchspec/v1/discovery
+  - type: TermsOfService
+    url: https://www.plyrium.com/vouchspec/policies
+  - type: LLMsTxt
+    url: llms/plyrium-com-llms.txt
+  - type: ToolCrosswalk
+    url: mcp/plyrium-com-tool-crosswalk.yml
+  - type: AgentCard
+    url: a2a/plyrium-com-a2a.yml
+  - type: AICatalog
+    url: well-known/plyrium-com-ai-catalog.json
   - type: ErrorCatalog
     url: errors/plyrium-com-problem-types.yml
   - type: DataModel
@@ -177,3 +251,10 @@ x-enrichment:
   status: enriched
   artifacts_added: 31
   pass: local-v3
+x-a2a:
+  verified: true
+  probed: '2026-09-26'
+  url: "https://vouchspec.plyrium.com/.well-known/agent-card.json"
+  grade: "conformant"
+  protocol_version: "0.3.0"
+  control: 200
