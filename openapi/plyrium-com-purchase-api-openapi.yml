@@ -1,9 +1,9 @@
 openapi: 3.2.0
 info:
-  title: Plyrium Com Purchase API
+  title: VouchSpec Agent Skill Evidence Purchase API
   version: 0.1.0
+  description: Agent-only API for purchasing fresh, isolated static validation and signed evidence for one exact immutable public GitHub Agent Skill commit. There is no human checkout.
   termsOfService: https://www.plyrium.com/vouchspec/policies
-  description: 'Operations tagged Purchase across 3 of this provider''s published API definitions: plyrium-com-vouchspec-openapi.json, plyrium-com-vouchspec-openapi.yml, plyrium-com-openapi.json. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://vouchspec.plyrium.com
   description: Base mainnet commerce
@@ -70,28 +70,58 @@ paths:
         amountAtomic: '250000'
         manifest: https://vouchspec.plyrium.com/.well-known/x402
       x-vouchspec-side-effects: Payment settlement and asynchronous isolated validation after a valid paid retry.
-    servers:
-    - url: https://vouchspec.plyrium.com
-      description: Base mainnet commerce
 components:
+  responses:
+    RateLimited:
+      description: Request rate exceeded.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unavailable:
+      description: VouchSpec is temporarily unavailable.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Malformed or invalid request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Cross-site mutation rejected.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    TooLarge:
+      description: Request body exceeds the bounded intake limit.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  parameters:
+    PaymentSignature:
+      name: PAYMENT-SIGNATURE
+      in: header
+      required: false
+      description: Base64-encoded x402 v2 authorization supplied only on the paid retry.
+      schema:
+        type: string
+        maxLength: 16384
   schemas:
-    Error:
-      type: object
-      additionalProperties: false
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          additionalProperties: false
-          required:
-          - code
-          - message
-          properties:
-            code:
-              type: string
-            message:
-              type: string
     PaidValidationAccess:
       type: object
       additionalProperties: false
@@ -133,6 +163,23 @@ components:
         payment:
           type: object
           additionalProperties: true
+    Error:
+      type: object
+      additionalProperties: false
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+            message:
+              type: string
     ValidationRequest:
       type: object
       additionalProperties: false
@@ -191,63 +238,9 @@ components:
         delivery_id:
           type: string
           pattern: ^[A-Za-z0-9_-]{8,64}$
-  responses:
-    RateLimited:
-      description: Request rate exceeded.
-      headers:
-        Retry-After:
-          schema:
-            type: integer
-            minimum: 1
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    TooLarge:
-      description: Request body exceeds the bounded intake limit.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    BadRequest:
-      description: Malformed or invalid request.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unavailable:
-      description: VouchSpec is temporarily unavailable.
-      headers:
-        Retry-After:
-          schema:
-            type: integer
-            minimum: 1
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Forbidden:
-      description: Cross-site mutation rejected.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-  parameters:
-    PaymentSignature:
-      name: PAYMENT-SIGNATURE
-      in: header
-      required: false
-      description: Base64-encoded x402 v2 authorization supplied only on the paid retry.
-      schema:
-        type: string
-        maxLength: 16384
 externalDocs:
   description: VouchSpec machine discovery contract
   url: https://vouchspec.plyrium.com/api/vouchspec/v1/discovery
-x-refined-from:
-- plyrium-com-vouchspec-openapi.json
-- plyrium-com-vouchspec-openapi.yml
-- plyrium-com-openapi.json
 x-vouchspec:
   agentOnly: true
   humanCheckout: false
