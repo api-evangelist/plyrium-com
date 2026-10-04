@@ -1,9 +1,9 @@
 openapi: 3.2.0
 info:
-  title: VouchSpec Agent Skill Evidence Verification API
+  title: Plyrium Com Verification API
   version: 0.1.0
-  description: Agent-only API for purchasing fresh, isolated static validation and signed evidence for one exact immutable public GitHub Agent Skill commit. There is no human checkout.
   termsOfService: https://www.plyrium.com/vouchspec/policies
+  description: 'Operations tagged Verification across 2 of this provider''s published API definitions: plyrium-com-openapi.json, plyrium-com-openapi.json. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://vouchspec.plyrium.com
   description: Base mainnet commerce
@@ -26,6 +26,9 @@ paths:
                 $ref: '#/components/schemas/IssuerKey'
         '503':
           $ref: '#/components/responses/Unavailable'
+    servers:
+    - url: https://vouchspec.plyrium.com
+      description: Base mainnet commerce
   /api/vouchspec/v1/receipts/{sha256_hex}:
     get:
       tags:
@@ -46,6 +49,9 @@ paths:
           $ref: '#/components/responses/NotFound'
         '503':
           $ref: '#/components/responses/Unavailable'
+    servers:
+    - url: https://vouchspec.plyrium.com
+      description: Base mainnet commerce
   /api/vouchspec/v1/receipts/{sha256_hex}/status:
     get:
       tags:
@@ -67,6 +73,9 @@ paths:
           $ref: '#/components/responses/NotFound'
         '503':
           $ref: '#/components/responses/Unavailable'
+    servers:
+    - url: https://vouchspec.plyrium.com
+      description: Base mainnet commerce
 components:
   responses:
     NotFound:
@@ -87,23 +96,6 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
-    Error:
-      type: object
-      additionalProperties: false
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          additionalProperties: false
-          required:
-          - code
-          - message
-          properties:
-            code:
-              type: string
-            message:
-              type: string
     IssuerKey:
       type: object
       additionalProperties: false
@@ -125,6 +117,23 @@ components:
           additionalProperties: true
         use:
           type: string
+    Error:
+      type: object
+      additionalProperties: false
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+            message:
+              type: string
   parameters:
     Sha256Hex:
       name: sha256_hex
@@ -137,6 +146,9 @@ components:
 externalDocs:
   description: VouchSpec machine discovery contract
   url: https://vouchspec.plyrium.com/api/vouchspec/v1/discovery
+x-refined-from:
+- plyrium-com-openapi.json
+- plyrium-com-openapi.json
 x-vouchspec:
   agentOnly: true
   humanCheckout: false

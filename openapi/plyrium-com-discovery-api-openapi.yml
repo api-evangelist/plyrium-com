@@ -1,9 +1,9 @@
 openapi: 3.2.0
 info:
-  title: VouchSpec Agent Skill Evidence Discovery API
+  title: Plyrium Com Discovery API
   version: 0.1.0
-  description: Agent-only API for purchasing fresh, isolated static validation and signed evidence for one exact immutable public GitHub Agent Skill commit. There is no human checkout.
   termsOfService: https://www.plyrium.com/vouchspec/policies
+  description: 'Operations tagged Discovery across 2 of this provider''s published API definitions: plyrium-com-openapi.json, plyrium-com-openapi.json. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://vouchspec.plyrium.com
   description: Base mainnet commerce
@@ -27,6 +27,9 @@ paths:
                 additionalProperties: true
         '503':
           $ref: '#/components/responses/Unavailable'
+    servers:
+    - url: https://vouchspec.plyrium.com
+      description: Base mainnet commerce
   /api/vouchspec/v1/discovery:
     get:
       tags:
@@ -43,6 +46,9 @@ paths:
                 additionalProperties: true
         '503':
           $ref: '#/components/responses/Unavailable'
+    servers:
+    - url: https://vouchspec.plyrium.com
+      description: Base mainnet commerce
   /.well-known/x402:
     get:
       tags:
@@ -59,6 +65,9 @@ paths:
                 additionalProperties: true
         '503':
           $ref: '#/components/responses/Unavailable'
+    servers:
+    - url: https://vouchspec.plyrium.com
+      description: Base mainnet commerce
   /api/vouchspec/v1/validate:
     get:
       tags:
@@ -77,19 +86,10 @@ paths:
         '503':
           $ref: '#/components/responses/Unavailable'
       x-vouchspec-side-effects: None. Payment is accepted only by POST.
+    servers:
+    - url: https://vouchspec.plyrium.com
+      description: Base mainnet commerce
 components:
-  responses:
-    Unavailable:
-      description: VouchSpec is temporarily unavailable.
-      headers:
-        Retry-After:
-          schema:
-            type: integer
-            minimum: 1
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   schemas:
     Error:
       type: object
@@ -108,9 +108,24 @@ components:
               type: string
             message:
               type: string
+  responses:
+    Unavailable:
+      description: VouchSpec is temporarily unavailable.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
 externalDocs:
   description: VouchSpec machine discovery contract
   url: https://vouchspec.plyrium.com/api/vouchspec/v1/discovery
+x-refined-from:
+- plyrium-com-openapi.json
+- plyrium-com-openapi.json
 x-vouchspec:
   agentOnly: true
   humanCheckout: false
