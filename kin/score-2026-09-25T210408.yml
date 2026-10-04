@@ -1,0 +1,56 @@
+# Kin Score artifact — plyrium-com — 2026-09-25T210408
+# The API Evangelist rating (https://github.com/api-evangelist/kin-score). Generated; do not edit.
+---
+kin_score:
+  slug: plyrium-com
+  schema_version: 0.23.0
+  scored_at: '2026-09-25'
+  run_ts: 2026-09-25T210408
+  composite: 50.6
+  band: developing
+  facets:
+    discoverability: 75.0
+    contract_quality: 38.6
+    contract_governance: 18.2
+    operational_transparency: 21.1
+    developer_ergonomics: 57.1
+    access_clarity: 65.8
+  agent_readiness:
+    score: 36.5
+    band: agent-ready
+    dimensions:
+      spec_presence: true
+      agentic_access: derived
+      reversibility_documented: false
+      mcp_server: documented
+      auth_clarity: false
+      idempotency: documented
+      error_semantics: derived
+      openapi_examples: false
+      rate_limit_signal: verified
+      event_surface_described: false
+      agent_skills: true
+      well_known_catalog: false
+      consent_identity: false
+      agent_card: conformant
+      dry_run_mode: false
+      delegated_identity: false
+      protected_resource_metadata: false
+      dynamic_client_registration: false
+      agentic_commerce: false
+  regulatory:
+    applies: true
+    regime: Horizontal (data, software, accessibility, platform)
+    regime_id: horizontal
+    score: 42.2
+    matched_via: fallback
+  provenance:
+    mcp: first-party
+    skills: first-party
+    agentic_access: derived
+    conformance: first-party
+    contracts:
+      total: 1
+      derived: 0
+      coverage: 0.0
+      callable: 100.0
