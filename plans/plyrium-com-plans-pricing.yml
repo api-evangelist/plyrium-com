@@ -66,3 +66,23 @@ product_plans_not_api:
   - {name: Bundle, price: 699, period: month, notes: '200 calls/month, 3 locations, 15 team members, 200 qualified leads/month'}
   - {name: Front Office, price: 1199, period: month, notes: 'unlimited calls/locations/team/leads, 1-hour support SLA'}
   annual: 'A "Save $696/yr" annual toggle is shown; annual prices are not itemised on the page'
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - free
+  - metered
+  units: []
+  plans:
+  - name: VouchSpec fresh exact-commit validation (mainnet)
+    access: other
+    model: metered
+    model_how: stated
+    units: []
+    periods: []
+  - name: VouchSpec free surface
+    access: free
+    model: free
+    model_how: derived
+    units: []
+    periods: []

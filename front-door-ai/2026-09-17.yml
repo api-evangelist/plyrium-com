@@ -1,0 +1,30 @@
+# Front Door AI Index — plyrium-com — 2026-09-17
+# AI vocabulary counted on the provider's root page. Generated; do not edit.
+# `score` is null unless ownership is `own` — see front_door_ai.py.
+front_door_ai:
+  slug: plyrium-com
+  lexicon_version: '1.0'
+  probed_at: '2026-09-25'
+  host: plyrium.com
+  final_host: www.plyrium.com
+  ownership: own
+  owner: plyrium-com
+  shares_host_with: null
+  inherited_from: null
+  alias_of: null
+  verdict: scored
+  score: 13
+  band: 5
+  band_label: prominent
+  host_score: 13
+  density: 22.38
+  words: 581
+  tiers:
+    agentic: 0
+    core: 10
+    model: 3
+  ambiguous: 0
+  top_terms:
+    AI: 10
+    Anthropic: 2
+    Claude: 1
