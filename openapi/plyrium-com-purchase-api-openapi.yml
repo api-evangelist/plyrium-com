@@ -1,9 +1,9 @@
 openapi: 3.2.0
 info:
-  title: Plyrium Com Purchase API
+  title: VouchSpec Agent Skill Evidence Purchase API
   version: 0.1.0
+  description: Agent-only API for purchasing fresh, isolated static validation and signed evidence for one exact immutable public GitHub Agent Skill commit. There is no human checkout.
   termsOfService: https://www.plyrium.com/vouchspec/policies
-  description: 'Operations tagged Purchase across 2 of this provider''s published API definitions: plyrium-com-openapi.json, plyrium-com-openapi.json. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://vouchspec.plyrium.com
   description: Base mainnet commerce
@@ -70,13 +70,19 @@ paths:
         amountAtomic: '250000'
         manifest: https://vouchspec.plyrium.com/.well-known/x402
       x-vouchspec-side-effects: Payment settlement and asynchronous isolated validation after a valid paid retry.
-    servers:
-    - url: https://vouchspec.plyrium.com
-      description: Base mainnet commerce
 components:
+  parameters:
+    PaymentSignature:
+      name: PAYMENT-SIGNATURE
+      in: header
+      required: false
+      description: Base64-encoded x402 v2 authorization supplied only on the paid retry.
+      schema:
+        type: string
+        maxLength: 16384
   responses:
-    Forbidden:
-      description: Cross-site mutation rejected.
+    TooLarge:
+      description: Request body exceeds the bounded intake limit.
       content:
         application/json:
           schema:
@@ -92,8 +98,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    TooLarge:
-      description: Request body exceeds the bounded intake limit.
+    Forbidden:
+      description: Cross-site mutation rejected.
       content:
         application/json:
           schema:
@@ -116,47 +122,6 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
-    PaidValidationAccess:
-      type: object
-      additionalProperties: false
-      required:
-      - schema_version
-      - order
-      - credentials
-      - endpoints
-      - payment
-      properties:
-        schema_version:
-          const: 1.0.0
-        order:
-          type: object
-          additionalProperties: true
-        credentials:
-          type: object
-          additionalProperties: false
-          required:
-          - tenant_api_key
-          - delivery_token
-          - delivery_token_expires_at
-          - notice
-          properties:
-            tenant_api_key:
-              type: string
-              description: Secret bearer capability shown once.
-            delivery_token:
-              type: string
-              description: Secret delivery capability shown once.
-            delivery_token_expires_at:
-              type: string
-              format: date-time
-            notice:
-              type: string
-        endpoints:
-          type: object
-          additionalProperties: true
-        payment:
-          type: object
-          additionalProperties: true
     ValidationRequest:
       type: object
       additionalProperties: false
@@ -232,21 +197,50 @@ components:
               type: string
             message:
               type: string
-  parameters:
-    PaymentSignature:
-      name: PAYMENT-SIGNATURE
-      in: header
-      required: false
-      description: Base64-encoded x402 v2 authorization supplied only on the paid retry.
-      schema:
-        type: string
-        maxLength: 16384
+    PaidValidationAccess:
+      type: object
+      additionalProperties: false
+      required:
+      - schema_version
+      - order
+      - credentials
+      - endpoints
+      - payment
+      properties:
+        schema_version:
+          const: 1.0.0
+        order:
+          type: object
+          additionalProperties: true
+        credentials:
+          type: object
+          additionalProperties: false
+          required:
+          - tenant_api_key
+          - delivery_token
+          - delivery_token_expires_at
+          - notice
+          properties:
+            tenant_api_key:
+              type: string
+              description: Secret bearer capability shown once.
+            delivery_token:
+              type: string
+              description: Secret delivery capability shown once.
+            delivery_token_expires_at:
+              type: string
+              format: date-time
+            notice:
+              type: string
+        endpoints:
+          type: object
+          additionalProperties: true
+        payment:
+          type: object
+          additionalProperties: true
 externalDocs:
   description: VouchSpec machine discovery contract
   url: https://vouchspec.plyrium.com/api/vouchspec/v1/discovery
-x-refined-from:
-- plyrium-com-openapi.json
-- plyrium-com-openapi.json
 x-vouchspec:
   agentOnly: true
   humanCheckout: false
