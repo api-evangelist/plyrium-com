@@ -1,0 +1,35 @@
+{
+  "endpoint": "https://vouchspec.plyrium.com/api/vouchspec/v1/mcp",
+  "captured": "2026-10-20",
+  "method": "initialize + tools/list (anonymous, no tool called; roadmap#992)",
+  "protocol_version": "2025-06-18",
+  "server_info": {
+    "name": "vouchspec-agent-skill-evidence",
+    "title": "VouchSpec Agent Skill Evidence",
+    "version": "0.2.0"
+  },
+  "result": {
+    "tools": [
+      {
+        "name": "get_vouchspec_discovery",
+        "title": "Get VouchSpec discovery",
+        "description": "Return current agent-only pricing, x402 payment, request, receipt, and status instructions.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "execution": {
+          "taskSupport": "forbidden"
+        }
+      }
+    ]
+  }
+}
