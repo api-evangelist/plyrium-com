@@ -55,9 +55,9 @@ auth:
 tool_count: 1
 tools:
 - name: get_vouchspec_discovery
+  description: Return current agent-only pricing, x402 payment, request, receipt, and status instructions.
   title: Get VouchSpec discovery
   category: discovery
-  description: Return current agent-only pricing, x402 payment, request, receipt, and status instructions.
   inputSchema:
     type: object
     properties: {}
@@ -98,3 +98,4 @@ tool_quality:
   scored: false
   note: Facts from the saved tools/list capture (mcp_tool_quality.py); recorded, not scored. Checks learned
     from Glimind's agent-readiness audit.
+tools_count: 1
