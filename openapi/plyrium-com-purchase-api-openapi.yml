@@ -263,3 +263,9 @@ x-vouchspec:
     inspection_worker_egress: false
     signer_egress: false
     expected_delivery_minutes: 10
+x-provenance:
+  method: harvested
+  publisher: Plyrium
+  source: https://vouchspec.plyrium.com/openapi.json
+  note: split by refine-openapis from the provider's own published document, verified by fetch (openapi/_original/*.fetch.json);
+    stamped by stamp-openapi-provenance.py (roadmap#793)
