@@ -36,7 +36,13 @@ artifacts:
   front-door-ai/2026-09-17.yml:
     method: unknown
     evidence: no authorship recorded
-  kin/checks-2026-09-24T161608.yml:
+  integrations/_index.yml:
+    method: generated
+    evidence: carries an API Evangelist house phrase
+  integrations/plyrium-com-integration-edges.yml:
+    method: searched
+    evidence: declared in the artifact
+  kin/checks-2026-10-11T110117.yml:
     method: generated
     evidence: Kin Score snapshot written by score.rb
   kin/score-2026-09-19T193153.yml:
@@ -69,28 +75,64 @@ artifacts:
   kin/score-2026-09-24T161608.yml:
     method: generated
     evidence: Kin Score snapshot written by score.rb
+  kin/score-2026-09-25T210408.yml:
+    method: generated
+    evidence: Kin Score snapshot written by score.rb
+  kin/score-2026-09-25T232841.yml:
+    method: generated
+    evidence: Kin Score snapshot written by score.rb
+  kin/score-2026-10-03T000835.yml:
+    method: generated
+    evidence: Kin Score snapshot written by score.rb
+  kin/score-2026-10-03T024842.yml:
+    method: generated
+    evidence: Kin Score snapshot written by score.rb
+  kin/score-2026-10-11T110117.yml:
+    method: generated
+    evidence: Kin Score snapshot written by score.rb
   lifecycle/plyrium-com-lifecycle.yml:
     method: searched
     evidence: declared in the artifact
   llms/plyrium-com-llms.txt:
     method: searched
     evidence: 'derive-llms-provenance.py: harvested'
+  mcp/plyrium-com-mcp-tools.json:
+    method: unknown
+    evidence: no authorship recorded
   mcp/plyrium-com-mcp.yml:
     method: searched
     evidence: declared in the artifact
   mcp/plyrium-com-tool-crosswalk.yml:
     method: derived
     evidence: declared in the artifact
+  openapi/_original/plyrium-com-openapi.json:
+    method: harvested
+    evidence: byte-identical to https://vouchspec.plyrium.com/openapi.json (sha256 d61c6774ca0f, fetched
+      2026-10-04)
+  openapi/_original/plyrium-com-openapi_2.json:
+    method: harvested
+    evidence: byte-identical to https://vouchspec.plyrium.com/openapi.json (sha256 d61c6774ca0f, fetched
+      2026-10-19)
   openapi/_original/plyrium-com-vouchspec-openapi.json:
     method: harvested
-    evidence: found in openapi/_original/; the fetch URL and bytes were not recorded, so byte-identity
-      to the provider's source is unverified
-  openapi/plyrium-com-vouchspec-openapi.yml:
+    evidence: byte-identical to https://vouchspec.plyrium.com/openapi.json (sha256 d61c6774ca0f, fetched
+      2026-10-04)
+  openapi/_original/plyrium-com-vouchspec-openapi.yml:
+    method: harvested
+    evidence: the same operations as https://vouchspec.plyrium.com/openapi.json (sha256 d61c6774ca0f,
+      fetched 2026-10-04)
+  openapi/plyrium-com-discovery-api-openapi.yml:
+    method: derived
+    evidence: paths are a subset of openapi/_original/ (split from the harvested spec)
+  openapi/plyrium-com-purchase-api-openapi.yml:
+    method: derived
+    evidence: paths are a subset of openapi/_original/ (split from the harvested spec)
+  openapi/plyrium-com-verification-api-openapi.yml:
     method: derived
     evidence: paths are a subset of openapi/_original/ (split from the harvested spec)
   overlays/plyrium-com-vouchspec-overlay.yaml:
-    method: unknown
-    evidence: no authorship recorded
+    method: derived
+    evidence: an API Evangelist overlay (title) over the provider's contract
   packages/plyrium-com-packages.yml:
     method: searched
     evidence: declared in the artifact
@@ -119,9 +161,6 @@ artifacts:
     method: unknown
     evidence: no authorship recorded
   well-known/plyrium-com-ai-catalog.json:
-    method: unknown
-    evidence: no authorship recorded
-  well-known/plyrium-com-openapi.json:
     method: unknown
     evidence: no authorship recorded
   well-known/plyrium-com-skills-index.json:
